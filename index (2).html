@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mangalam Landmark | Competency Standards Portal</title>
+<style>
+  :root{
+    --navy-950:#081527;
+    --navy-900:#0B2545;
+    --navy-800:#13315C;
+    --navy-700:#1D4079;
+    --gold-500:#C89B3C;
+    --gold-400:#DAB35C;
+    --gold-100:#F6ECD3;
+    --paper:#F6F4EE;
+    --paper-2:#EFEBE0;
+    --ink:#1B1F27;
+    --ink-soft:#5A6272;
+    --line:#E3DFD2;
+    --white:#FFFFFF;
+    --functional:#2E6FDB;
+    --leadership:#3B4EA3;
+    --strategic:#7A4FA3;
+    --behavioural:#128277;
+    --rolefit:#C89B3C;
+    --danger:#C0392B;
+    --danger-bg:#FBEAE7;
+    --warn:#B8790F;
+    --warn-bg:#FCF1DD;
+    --good:#1E8449;
+    --good-bg:#E9F6EE;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(11,37,69,.06), 0 8px 24px -12px rgba(11,37,69,.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family: Georgia, Cambria, "Times New Roman", serif;
+    margin:0;
+    color: var(--navy-900);
+    font-weight: 600;
+  }
+  button{font-family:inherit;}
+  ::selection{ background: var(--gold-100); }
+
+  /* ---------- Utility ---------- */
+  .hidden{ display:none !important; }
+  .row{ display:flex; align-items:center; }
+  .between{ justify-content:space-between; }
+  .gap8{ gap:8px; } .gap12{ gap:12px; } .gap16{ gap:16px; }
+  .muted{ color: var(--ink-soft); }
+  .small{ font-size:12.5px; }
+  .badge{
+    display:inline-flex; align-items:center; gap:5px;
+    font-size:11.5px; font-weight:700; letter-spacing:.02em;
+    padding:3px 9px; border-radius:999px; text-transform:uppercase;
+  }
+  .badge.good{ background:var(--good-bg); color:var(--good); }
+  .badge.warn{ background:var(--warn-bg); color:var(--warn); }
+  .badge.danger{ background:var(--danger-bg); color:var(--danger); }
+  .badge.neutral{ background:#EDEFF5; color:var(--ink-soft); }
+  .card{
+    background:var(--white); border:1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .btn{
+    border:none; cursor:pointer; border-radius:8px; padding:10px 18px;
+    font-size:14px; font-weight:600; letter-spacing:.01em;
+    transition: transform .06s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:active{ transform: translateY(1px); }
+  .btn-primary{ background: var(--navy-900); color:var(--gold-100); }
+  .btn-primary:hover{ background: var(--navy-800); }
+  .btn-gold{ background: var(--gold-500); color: var(--navy-950); }
+  .btn-gold:hover{ background: var(--gold-400); }
+  .btn-ghost{ background: transparent; color: var(--navy-900); border:1px solid var(--line); }
+  .btn-ghost:hover{ background: var(--paper-2); }
+  .btn-danger-ghost{ background: transparent; color: var(--danger); border:1px solid #EFD3CE; }
+  .btn-danger-ghost:hover{ background: var(--danger-bg); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  select, input[type=text], input[type=password], input[type=number]{
+    font-family:inherit; font-size:14px; padding:9px 11px; border-radius:8px;
+    border:1px solid #D6D2C4; background:var(--white); color:var(--ink);
+  }
+  select:focus, input:focus{ outline:2px solid var(--gold-400); outline-offset:1px; }
+  a{ color: var(--navy-700); }
+  table{ border-collapse:collapse; width:100%; }
+  th,td{ text-align:left; padding:10px 12px; font-size:13.5px; }
+  thead th{
+    background: var(--navy-900); color: var(--gold-100);
+    font-size:11.5px; text-transform:uppercase; letter-spacing:.04em;
+    position:sticky; top:0; z-index:1;
+  }
+  tbody tr{ border-bottom:1px solid var(--line); }
+  tbody tr:nth-child(even){ background: #FBFAF6; }
+  tbody tr:hover{ background: var(--gold-100); }
+
+  /* ---------- Login screen ---------- */
+  #screen-login{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(200,155,60,.18), transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, rgba(59,78,163,.25), transparent 55%),
+      linear-gradient(160deg, var(--navy-950), var(--navy-900) 55%, var(--navy-800));
+    padding:32px;
+  }
+  .login-wrap{
+    width:100%; max-width:980px; display:grid; grid-template-columns: 1.1fr 1fr;
+    background: var(--paper); border-radius:18px; overflow:hidden; box-shadow: 0 30px 80px -20px rgba(0,0,0,.55);
+  }
+  .login-brand{
+    background: linear-gradient(155deg, var(--navy-900), var(--navy-800));
+    color: var(--gold-100); padding:44px 38px; position:relative; overflow:hidden;
+  }
+  .login-brand::after{
+    content:""; position:absolute; right:-60px; bottom:-60px; width:220px; height:220px;
+    border:1px solid rgba(218,179,92,.25); border-radius:50%;
+  }
+  .login-brand::before{
+    content:""; position:absolute; right:-10px; bottom:-100px; width:260px; height:260px;
+    border:1px solid rgba(218,179,92,.15); border-radius:50%;
+  }
+  .brand-mark{
+    font-family: Georgia, serif; font-size:13px; letter-spacing:.22em; color:var(--gold-400);
+    text-transform:uppercase; margin-bottom:26px;
+  }
+  .login-brand h1{ color:var(--white); font-size:30px; line-height:1.25; max-width:320px; }
+  .login-brand .sub{ margin-top:14px; color:#C9D2E4; font-size:14px; line-height:1.6; max-width:320px; }
+  .cluster-legend{ margin-top:38px; display:flex; flex-direction:column; gap:10px; position:relative; z-index:2;}
+  .cluster-legend .item{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:#C9D2E4; }
+  .dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+  .login-panel{ padding:40px 38px; background:var(--paper); }
+  .role-toggle{ display:flex; background:var(--paper-2); border-radius:10px; padding:4px; margin-bottom:24px; }
+  .role-toggle button{
+    flex:1; border:none; background:transparent; padding:10px 8px; font-size:13.5px; font-weight:700;
+    border-radius:8px; cursor:pointer; color:var(--ink-soft);
+  }
+  .role-toggle button.active{ background:var(--navy-900); color:var(--gold-100); }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--navy-900); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em; }
+  .field select, .field input{ width:100%; }
+  #login-error{ color:var(--danger); font-size:13px; margin-bottom:12px; min-height:0; }
+  .login-hint{ margin-top:18px; font-size:12px; color:var(--ink-soft); background:var(--paper-2); padding:10px 12px; border-radius:8px; line-height:1.5; }
+  .callout{
+    display:flex; align-items:flex-start; gap:12px;
+    background: var(--gold-100); border:1.5px solid var(--gold-500);
+    border-radius:10px; padding:14px 16px; margin-bottom:18px;
+    font-size:13.5px; color:var(--navy-900); line-height:1.55;
+  }
+  .callout .callout-ic{ font-size:20px; flex:none; line-height:1; }
+  .callout b{ color:var(--navy-950); }
+  .callout button{
+    background:var(--navy-900); color:var(--gold-100); border:none; border-radius:7px;
+    padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; margin-left:auto; flex:none;
+  }
+  .callout button:hover{ background:var(--navy-800); }
+
+  /* ---------- App shell ---------- */
+  #app{ display:flex; min-height:100vh; }
+  .sidebar{
+    width:250px; flex:none; background: linear-gradient(180deg, var(--navy-950), var(--navy-900));
+    color:#D9E0EE; padding:22px 16px; display:flex; flex-direction:column;
+  }
+  .sidebar .brand{ display:flex; align-items:center; gap:10px; padding:6px 8px 22px; border-bottom:1px solid rgba(255,255,255,.1); margin-bottom:16px;}
+  .sidebar .brand-title{ font-family:Georgia,serif; font-size:15px; color:var(--white); line-height:1.25; }
+  .sidebar .brand-title small{ display:block; font-size:10.5px; color:var(--gold-400); letter-spacing:.12em; text-transform:uppercase; margin-top:2px;}
+  .navitem{
+    display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:8px; cursor:pointer;
+    font-size:13.5px; font-weight:600; color:#B7C1D6; margin-bottom:3px;
+  }
+  .navitem:hover{ background:rgba(255,255,255,.06); color:var(--white); }
+  .navitem.active{ background: var(--gold-500); color: var(--navy-950); }
+  .navitem .ic{ width:16px; text-align:center; }
+  .sidebar-foot{ margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,.1); }
+  .who{ font-size:12.5px; color:#B7C1D6; margin-bottom:10px; line-height:1.5; }
+  .who b{ color:var(--white); display:block; font-size:13.5px; }
+  .logout-btn{ width:100%; background:rgba(255,255,255,.08); color:#fff; border:none; border-radius:8px; padding:9px; font-size:12.5px; cursor:pointer; font-weight:600; }
+  .logout-btn:hover{ background:rgba(255,255,255,.16); }
+
+  .main{ flex:1; min-width:0; padding:28px 34px 60px; }
+  .topbar{ margin-bottom:22px; }
+  .topbar h2{ font-size:22px; }
+  .topbar .desc{ color:var(--ink-soft); font-size:13.5px; margin-top:4px; max-width:760px; line-height:1.5;}
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:24px; }
+  .kpi{ padding:18px 18px; }
+  .kpi .lbl{ font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:700; }
+  .kpi .val{ font-family:Georgia,serif; font-size:30px; color:var(--navy-900); margin-top:6px; }
+  .kpi .sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+  .tab{
+    border:1px solid var(--line); background:var(--white); padding:9px 15px; border-radius:999px;
+    font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft); display:flex; align-items:center; gap:7px;
+  }
+  .tab .dot{ width:8px; height:8px; }
+  .tab.active{ background:var(--navy-900); color:var(--gold-100); border-color:var(--navy-900); }
+
+  .toolbar{ display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .panel{ padding:22px; margin-bottom:20px; overflow-x:auto; }
+  .panel > table{ min-width:600px; }
+  .panel h3{ font-size:16px; margin-bottom:4px;}
+  .panel .panel-desc{ color:var(--ink-soft); font-size:13px; margin-bottom:16px; }
+
+  .score-input{ width:64px; text-align:center; font-weight:700; }
+  .gap-cell{ font-weight:800; }
+  .gap-pos{ color:var(--danger); }
+  .gap-zero{ color:var(--good); }
+  .gap-neg{ color:var(--navy-700); }
+
+  .rate-item{ padding:16px 0; border-bottom:1px solid var(--line); }
+  .rate-item:last-child{ border-bottom:none; }
+  .rate-item .rname{ font-weight:700; color:var(--navy-900); font-size:14.5px; }
+  .rate-item .rdef{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; line-height:1.5; max-width:640px;}
+  .rate-item .rind{ font-size:11.5px; color:#8A8F7E; margin-top:5px; line-height:1.5; max-width:640px; font-style:italic;}
+  .scale{ display:flex; gap:6px; margin-top:10px; }
+  .scale button{
+    width:40px; height:40px; border-radius:8px; border:1.5px solid var(--line); background:var(--white);
+    font-weight:800; cursor:pointer; color:var(--navy-800); font-size:14px;
+  }
+  .scale button.sel{ background:var(--navy-900); color:var(--gold-100); border-color:var(--navy-900); }
+  .scale button:hover{ border-color: var(--gold-500); }
+
+  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .bar-label{ width:230px; flex:none; font-size:12.5px; color:var(--ink); }
+  .bar-track{ flex:1; height:14px; background:var(--paper-2); border-radius:7px; overflow:hidden; position:relative;}
+  .bar-fill{ height:100%; border-radius:7px 0 0 7px; }
+  .bar-val{ width:34px; flex:none; text-align:right; font-size:12px; font-weight:700; color:var(--ink-soft); }
+
+  .heat-grid{ display:grid; gap:4px; }
+  .heat-cell{ padding:9px 4px; text-align:center; font-size:11.5px; font-weight:700; border-radius:5px; color:#fff; }
+
+  .status-pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .empty-state{ text-align:center; padding:50px 20px; color:var(--ink-soft); }
+  .empty-state .big{ font-size:34px; margin-bottom:10px; }
+
+  footer.foot-note{ margin-top:30px; font-size:11.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:14px; }
+
+  @media (max-width: 900px){
+    .login-wrap{ grid-template-columns:1fr; }
+    .login-brand{ display:none; }
+    #app{ flex-direction:column; }
+    .sidebar{ width:100%; flex-direction:row; overflow-x:auto; align-items:center; }
+    .sidebar .brand{ display:none; }
+    .sidebar-foot{ display:none; }
+    .navitem{ white-space:nowrap; }
+    .main{ padding:20px; }
+    .bar-label{ width:130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="brand-mark">Mangalam Landmark</div>
+      <h1>Competency Standards &amp; Gap Assessment Portal</h1>
+      <div class="sub">Set role benchmarks, run self-assessments, and build your year-long training calendar — across Functional, Leadership, Strategic and Behavioural competencies.</div>
+      <div class="cluster-legend">
+        <div class="item"><span class="dot" style="background:var(--functional)"></span> Functional / Technical</div>
+        <div class="item"><span class="dot" style="background:var(--leadership)"></span> Leadership &amp; People</div>
+        <div class="item"><span class="dot" style="background:var(--strategic)"></span> Strategic Thinking</div>
+        <div class="item"><span class="dot" style="background:var(--behavioural)"></span> Behavioural / Soft Skills</div>
+        <div class="item"><span class="dot" style="background:var(--rolefit)"></span> Role Fitness &amp; Growth</div>
+      </div>
+    </div>
+    <div class="login-panel">
+      <div class="role-toggle">
+        <button id="roleBtnDirector" class="active" onclick="setLoginRole('director')">Director / Admin</button>
+        <button id="roleBtnHod" onclick="setLoginRole('hod')">HOD Self-Assessment</button>
+      </div>
+      <div id="login-error"></div>
+
+      <div id="director-login-fields">
+        <div class="field">
+          <label>Your Name</label>
+          <select id="adminSelect"></select>
+        </div>
+        <div class="field">
+          <label>Access Password</label>
+          <input type="password" id="dirPass" placeholder="Enter your password" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+      </div>
+
+      <div id="hod-login-fields" class="hidden">
+        <div class="field">
+          <label>Select Your Department</label>
+          <select id="hodDept"></select>
+        </div>
+        <div class="field">
+          <label>Access Passcode</label>
+          <input type="password" id="hodPass" placeholder="Enter your department passcode" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+      </div>
+
+      <button class="btn btn-gold" style="width:100%; padding:12px;" onclick="attemptLogin()">Sign in →</button>
+      <div class="login-hint" id="loginHint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app" class="hidden">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-title">Mangalam Landmark<small>Competency Portal</small></div>
+    </div>
+    <div id="navItemsDirector" class="hidden">
+      <div class="navitem" data-view="d-overview" onclick="showView('d-overview')">Overview</div>
+      <div class="navitem" data-view="d-standards" onclick="showView('d-standards')">Set Standards</div>
+      <div class="navitem" data-view="d-ratings" onclick="showView('d-ratings')">Self-Ratings &amp; Gaps</div>
+      <div class="navitem" data-view="d-dashboard" onclick="showView('d-dashboard')">Analytics Dashboard</div>
+      <div class="navitem" data-view="d-calendar" onclick="showView('d-calendar')">Training Calendar</div>
+      <div class="navitem" data-view="d-access" onclick="showView('d-access')">Manage Access</div>
+      <div class="navitem" data-view="d-structure" onclick="structDeptMsg={text:'',ok:true}; structCompMsg={text:'',ok:true}; showView('d-structure')">Manage Structure</div>
+      <div class="navitem" data-view="d-trainers" onclick="trainerMsg={text:'',ok:true}; showView('d-trainers')">Trainer Directory</div>
+      <div class="navitem" data-view="d-backup" onclick="backupMsg={text:'',ok:true}; showView('d-backup')">Backup &amp; Restore</div>
+      <div class="navitem" data-view="guide" onclick="showView('guide')">Process Guide</div>
+    </div>
+    <div id="navItemsHod" class="hidden">
+      <div class="navitem" data-view="h-rate" onclick="showView('h-rate')">My Self-Assessment</div>
+      <div class="navitem" data-view="h-status" onclick="showView('h-status')">My Status</div>
+      <div class="navitem" data-view="guide" onclick="showView('guide')">Process Guide</div>
+    </div>
+    <div class="sidebar-foot">
+      <div class="who" id="whoBox"></div>
+      <button class="logout-btn" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main" id="mainArea">
+    <!-- views injected by JS -->
+  </div>
+</div>
+
+<script>
+const RAW_DATA = {"departments": [{"slug": "accounts-finance", "name": "Accounts & Finance", "shortCode": "ACF"}, {"slug": "design-development", "name": "Design & Development", "shortCode": "DND"}, {"slug": "business-development-land-acquisition", "name": "Business Development & Land Acquisition", "shortCode": "BDL"}, {"slug": "sales-marketing-crm", "name": "Sales, Marketing & CRM", "shortCode": "SMC"}, {"slug": "purchase-legal-liaison", "name": "Purchase, Legal & Liaison", "shortCode": "PLL"}, {"slug": "contracts-business-development-cbd", "name": "Contracts & Business Development (CBD)", "shortCode": "CBD"}, {"slug": "engineering", "name": "Engineering", "shortCode": "ENG"}, {"slug": "hr-administration", "name": "HR & Administration", "shortCode": "HRA"}, {"slug": "quality", "name": "Quality", "shortCode": "QLT"}, {"slug": "safety", "name": "Safety", "shortCode": "SFT"}], "competencies": [{"code": "F1", "name": "Real Estate Domain Expertise", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Depth of knowledge in real estate development \u2014 land acquisition, approvals, construction, sales, and handover lifecycle.", "indicators": "Can explain project lifecycle end-to-end. Aware of market dynamics, FSI, TDR, DC rules, RERA. Tracks industry trends proactively.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "F2", "name": "Regulatory & Compliance Knowledge", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Understanding of all statutory, legal, and regulatory requirements applicable to the role and the company.", "indicators": "Demonstrates working knowledge of RERA, MOFA, Maharashtra DC Rules, Labour laws, Statutory compliance. No compliance surprises.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 5, "sales-marketing-crm": 3, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 3, "engineering": 5, "hr-administration": 5, "quality": 5, "safety": 5}}, {"code": "F3", "name": "Financial & Commercial Acumen", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Ability to understand, interpret, and work with financial data, budgets, P&L, and cost structures.", "indicators": "Reads financial reports independently. Can cost and price decisions. Understands ROI, IRR, project viability.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 5, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "F4", "name": "Technology & Systems Proficiency", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Effective use of relevant software, ERP, CRM, and digital tools relevant to the role.", "indicators": "Uses Keka / AutoCAD / MS Office / CRM / ERP confidently. Does not rely on others for basic system tasks.", "req": {"accounts-finance": 4, "design-development": 5, "business-development-land-acquisition": 3, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 3, "hr-administration": 4, "quality": 3, "safety": 3}}, {"code": "F5", "name": "Process Orientation", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Ability to follow, improve, and create structured processes and SOPs.", "indicators": "Has documented SOPs for key activities. Follows processes consistently. Suggests improvements proactively.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "F6", "name": "Planning & Prioritisation", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Ability to plan work, set priorities, and manage time effectively.", "indicators": "Maintains weekly/monthly plans. Sets clear priorities. Delivers on time without constant follow-up.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "F7", "name": "Quality & Accuracy", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Attention to detail and commitment to error-free, high-quality output.", "indicators": "Work rarely requires rework. Checks own work before submission. Quality is consistent across busy and slow periods.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 5, "hr-administration": 5, "quality": 5, "safety": 5}}, {"code": "F8", "name": "Reporting & Documentation", "cluster": "functional", "clusterLabel": "Functional / Technical", "definition": "Ability to prepare clear, accurate, and timely reports, MIS, and documentation.", "indicators": "Submits reports on time. Reports are clear, factual, and decision-ready. Documentation is organised and retrievable.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "L1", "name": "Team Building & Cohesion", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to build a strong, high-performing, and cohesive team.", "indicators": "Team has low attrition. Team members trust each other. Conflicts are managed constructively. New members are integrated smoothly.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "L2", "name": "Delegation & Empowerment", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to delegate effectively to the right person with the right brief and appropriate follow-up.", "indicators": "Delegates tasks with clear context and deadline. Does not micromanage or do work that should be delegated. Team grows through delegation.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "L3", "name": "Performance Management", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to set clear expectations, give regular feedback, and hold team accountable.", "indicators": "Has set KRAs for all direct reports. Gives monthly feedback. Does not avoid difficult performance conversations. PIPs are initiated when needed.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "L4", "name": "Talent Development & Coaching", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to identify potential, coach, and develop team members for current and future roles.", "indicators": "Has identified high-potentials in the team. Actively coaches; not just instructs. Succession plans exist for key roles under them.", "req": {"accounts-finance": 4, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 3, "engineering": 3, "hr-administration": 5, "quality": 3, "safety": 5}}, {"code": "L5", "name": "Conflict Resolution", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to identify, address, and resolve interpersonal and team conflicts effectively.", "indicators": "Conflicts are resolved before they escalate to HR or MD. Uses structured resolution approach. Both parties feel heard.", "req": {"accounts-finance": 4, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 3, "engineering": 3, "hr-administration": 4, "quality": 3, "safety": 4}}, {"code": "L6", "name": "Motivation & Engagement", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to keep the team energised, recognised, and engaged through challenges.", "indicators": "Team morale is visibly positive. Celebrates wins. Addresses demotivation early. Retention is above department average.", "req": {"accounts-finance": 4, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 3, "engineering": 3, "hr-administration": 5, "quality": 3, "safety": 5}}, {"code": "L7", "name": "Cross-Functional Collaboration", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to work effectively with other departments and leaders to achieve shared goals.", "indicators": "Proactively coordinates with other HODs. Shares information. Does not build silos. Cross-functional projects are delivered smoothly.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "L8", "name": "Hiring Judgement", "cluster": "leadership", "clusterLabel": "Leadership & People", "definition": "Ability to attract, evaluate, and recommend the right talent for the team.", "indicators": "Has a hiring track record with high conversion and low early attrition. Assesses culture fit, not just skills. Defines JDs clearly.", "req": {"accounts-finance": 4, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 3, "engineering": 3, "hr-administration": 5, "quality": 3, "safety": 5}}, {"code": "S1", "name": "Business Acumen & Market Awareness", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Understanding of business model, competitive landscape, and market dynamics beyond own function.", "indicators": "Can connect own function to company revenue and profitability. Tracks competitors. Understands how macro trends affect the business.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "S2", "name": "Long-term Planning", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to think beyond immediate tasks and plan for medium to long-term outcomes.", "indicators": "Develops 6\u201312 month roadmaps for the function. Anticipates future challenges. Plans resources ahead of need.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "S3", "name": "Problem Solving & Decision Making", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to analyse complex problems, generate options, and make sound decisions with incomplete information.", "indicators": "Presents solutions, not just problems. Uses data to support decisions. Makes timely calls without excessive escalation.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 5, "hr-administration": 4, "quality": 5, "safety": 4}}, {"code": "S4", "name": "Innovation & Continuous Improvement", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to challenge the status quo and introduce better ways of doing things.", "indicators": "Has improved at least 1\u20132 processes in the past 12 months. Encourages team to experiment. Does not default to \"this is how we always did it\".", "req": {"accounts-finance": 4, "design-development": 5, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 3, "hr-administration": 4, "quality": 3, "safety": 4}}, {"code": "S5", "name": "Stakeholder Management", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to identify, influence, and manage relationships with key internal and external stakeholders.", "indicators": "Has mapped key stakeholders. Proactively communicates with them. Manages expectations well. Rarely surprises senior leadership.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 5, "hr-administration": 4, "quality": 5, "safety": 4}}, {"code": "S6", "name": "Change Management", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to lead self and team through organisational change with resilience and positivity.", "indicators": "Adopts new systems and processes without resistance. Explains change rationale to team clearly. Maintains output during transitions.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "S7", "name": "Resource Optimisation", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to maximise output from available people, budget, and time resources.", "indicators": "Function operates within budget. Headcount is optimised. Does not over-resource. Identifies cost efficiencies proactively.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "S8", "name": "Risk Identification & Mitigation", "cluster": "strategic", "clusterLabel": "Strategic Thinking", "definition": "Ability to identify business, operational, and people risks early and take preventive action.", "indicators": "Raises risks before they become issues. Has contingency plans for key activities. Escalates appropriately and on time.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 5, "sales-marketing-crm": 4, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 5, "hr-administration": 4, "quality": 5, "safety": 4}}, {"code": "B1", "name": "Verbal & Written Communication", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Ability to communicate clearly, concisely, and professionally in speaking and writing.", "indicators": "Emails are professional and clear. Presentations are structured. Does not over-communicate or under-communicate. Adapts style to audience.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "B2", "name": "Active Listening", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Ability to listen to understand \u2014 not just to respond \u2014 and demonstrate comprehension.", "indicators": "Paraphrases before responding in difficult conversations. Does not interrupt. Asks clarifying questions. Team members feel heard.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "B3", "name": "Influencing Without Authority", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Ability to persuade and gain buy-in from peers, seniors, and teams without relying on positional authority.", "indicators": "Builds consensus rather than issuing instructions. Uses data and logic to persuade. Respected by peers even when disagreeing.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "B4", "name": "Ownership & Accountability", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Takes full responsibility for results \u2014 does not blame others, circumstances, or resources.", "indicators": "Does not make excuses. Proactively flags issues. Follows through on commitments. Owns both successes and failures.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 5, "hr-administration": 5, "quality": 5, "safety": 5}}, {"code": "B5", "name": "Integrity & Ethics", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Demonstrates honest, transparent, and ethical conduct in all situations.", "indicators": "Does not misrepresent information to seniors. Raises concerns through proper channels. Maintains confidentiality. Leads by example on ethics.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 5, "engineering": 5, "hr-administration": 5, "quality": 5, "safety": 5}}, {"code": "B6", "name": "Resilience & Adaptability", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Ability to remain effective and positive under pressure, change, and ambiguity.", "indicators": "Does not crack under pressure. Adapts quickly to changing priorities. Maintains quality even during high-stress periods.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 5, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 4, "quality": 4, "safety": 4}}, {"code": "B7", "name": "Self-Awareness & Emotional Intelligence", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Understanding of own strengths, limitations, triggers, and impact on others.", "indicators": "Receives feedback gracefully. Manages emotional reactions professionally. Aware of how own behaviour affects team. Seeks to improve.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 5, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "B8", "name": "Internal Customer Orientation", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Treats colleagues, other departments, and company systems with the same care as external customers.", "indicators": "Responds to internal requests promptly. Does not create bottlenecks. Collaborates generously. Seeks feedback from internal stakeholders.", "req": {"accounts-finance": 5, "design-development": 4, "business-development-land-acquisition": 4, "sales-marketing-crm": 5, "purchase-legal-liaison": 5, "contracts-business-development-cbd": 4, "engineering": 4, "hr-administration": 5, "quality": 4, "safety": 5}}, {"code": "B9", "name": "External Stakeholder Excellence", "cluster": "behavioural", "clusterLabel": "Behavioural / Soft Skills", "definition": "Manages relationships with vendors, consultants, customers, and government bodies professionally.", "indicators": "Vendors and consultants speak positively of the working relationship. No relationship-damaging incidents. Represents Mangalam well externally.", "req": {"accounts-finance": 5, "design-development": 5, "business-development-land-acquisition": 5, "sales-marketing-crm": 4, "purchase-legal-liaison": 4, "contracts-business-development-cbd": 4, "engineering": 5, "hr-administration": 4, "quality": 5, "safety": 4}}]};
+</script>
+<script>
+/* ===================== CONSTANTS ===================== */
+let DEPTS = [];   // array of display names, derived from STRUCT.departments
+let COMP = [];    // array of competency objects, derived from STRUCT.competencies
+let STRUCT = { departments: [], competencies: [], admins: [], trainers: [] };
+const CLUSTERS = [
+  {key:'functional',   label:'Functional / Technical', color:'var(--functional)'},
+  {key:'leadership',   label:'Leadership & People',     color:'var(--leadership)'},
+  {key:'strategic',    label:'Strategic Thinking',      color:'var(--strategic)'},
+  {key:'behavioural',  label:'Behavioural / Soft Skills',color:'var(--behavioural)'}
+];
+// Curated, real-world training topic titles per competency — used as the
+// default (fully editable) title when a training program is created for
+// a gap. Falls back to a generic pattern for any competency added later
+// via Manage Structure that isn't in this list.
+const TRAINING_TOPICS = {
+  F1:'Real Estate Lifecycle & RERA Fundamentals Workshop',
+  F2:'Statutory Compliance Masterclass: RERA, DC Rules & Labour Law',
+  F3:'Financial Acumen for Non-Finance Managers',
+  F4:'ERP/CRM Systems Proficiency Bootcamp',
+  F5:'SOP Design & Process Excellence Workshop',
+  F6:'Strategic Planning & Prioritisation Workshop',
+  F7:'Quality Assurance & Error-Proofing Workshop',
+  F8:'Business Reporting & MIS Documentation Workshop',
+  L1:'Team Building & High-Performance Culture Workshop',
+  L2:'Delegation & Empowerment for Managers',
+  L3:'Performance Management & Feedback Skills Workshop',
+  L4:'Coaching for Performance: Manager-as-Coach Program',
+  L5:'Conflict Resolution & Difficult Conversations Workshop',
+  L6:'Employee Motivation & Engagement Workshop',
+  L7:'Cross-Functional Collaboration Workshop',
+  L8:'Structured Interviewing & Hiring Judgement Workshop',
+  S1:'Business Acumen & Real Estate Market Trends Workshop',
+  S2:'Long-Term & Strategic Planning Workshop',
+  S3:'Structured Problem-Solving & Decision-Making Workshop',
+  S4:'Innovation & Continuous Improvement Workshop',
+  S5:'Stakeholder Management & Influence Workshop',
+  S6:'Change Management Certification Workshop',
+  S7:'Resource & Cost Optimisation Workshop',
+  S8:'Risk Identification & Mitigation Workshop',
+  B1:'Business Communication Skills Workshop',
+  B2:'Active Listening & Empathetic Communication Workshop',
+  B3:'Influencing Without Authority Workshop',
+  B4:'Ownership & Accountability Workshop',
+  B5:'Workplace Ethics & Integrity Workshop',
+  B6:'Resilience & Adaptability in the Workplace',
+  B7:'Emotional Intelligence & Self-Awareness Workshop',
+  B8:'Internal Customer Service Excellence Workshop',
+  B9:'Client & External Stakeholder Excellence Workshop'
+};
+function suggestedTopic(comp){
+  return TRAINING_TOPICS[comp.code] || `${comp.name}: Skill Development Workshop`;
+}
+/* Real-world, date-aware quarters. Indian FY runs April→March. Returns
+   only the CURRENT and FUTURE quarters of this FY — a past quarter is
+   never offered for scheduling. */
+function getForwardQuarters(){
+  const now = new Date();
+  const month = now.getMonth(); // 0=Jan
+  const year = now.getFullYear();
+  const fyStartYear = month >= 3 ? year : year - 1;
+  const fyMonthIdx = (month - 3 + 12) % 12; // 0=April
+  const currentQ = Math.floor(fyMonthIdx / 3); // 0..3
+  const allLabels = [
+    `Q1 (Apr–Jun ${fyStartYear})`,
+    `Q2 (Jul–Sep ${fyStartYear})`,
+    `Q3 (Oct–Dec ${fyStartYear})`,
+    `Q4 (Jan–Mar ${fyStartYear+1})`
+  ];
+  const forward = [];
+  for(let q=currentQ; q<4; q++){ forward.push({index:q, label:allLabels[q]}); }
+  return forward;
+}
+
+function compsByCluster(clusterKey){ return COMP.filter(c => c.cluster === clusterKey); }
+function clusterMeta(key){ return CLUSTERS.find(c=>c.key===key); }
+function slugFor(deptIdx){ return STRUCT.departments[deptIdx] ? STRUCT.departments[deptIdx].slug : null; }
+function slugify(name){
+  return String(name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'') || 'dept';
+}
+function ensureUniqueSlug(base, existingSlugs){
+  let s = base, n = 2;
+  while(existingSlugs.includes(s)){ s = base + '-' + n; n++; }
+  return s;
+}
+function generateShortCode(name, existingCodes){
+  const words = String(name).replace(/[()]/g,'').split(/[\s&,-]+/).filter(Boolean);
+  let code = words.map(w=>w[0]).join('').toUpperCase().slice(0,4);
+  if(code.length < 2) code = (name.slice(0,3)).toUpperCase();
+  let base = code, n = 2;
+  while(existingCodes.includes(code)){ code = base + n; n++; }
+  return code;
+}
+function nextCompetencyCode(clusterKey){
+  const prefix = {functional:'F', leadership:'L', strategic:'S', behavioural:'B'}[clusterKey];
+  const nums = COMP.filter(c=>c.cluster===clusterKey).map(c=>{
+    const m = c.code.match(/(\d+)$/); return m ? parseInt(m[1],10) : 0;
+  });
+  const max = nums.length ? Math.max(...nums) : 0;
+  return prefix + (max+1);
+}
+
+/* ===================== STORAGE HELPERS (Supabase) ===================== */
+const SUPA_URL = 'https://hudbqdnckmbrxodcfdlh.supabase.co';
+const SUPA_KEY = 'sb_publishable_SIkM7Vs6eS_5h4IePtREAw_udoSPnzD';
+let LAST_STORAGE_ERROR = '';
+
+async function kget(key){
+  try{
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/kv_store?key=eq.${encodeURIComponent(key)}&select=value`,
+      { headers: { 'apikey': SUPA_KEY } }
+    );
+    if(!res.ok){
+      LAST_STORAGE_ERROR = `GET ${key} → HTTP ${res.status}: ${await res.text()}`;
+      console.error(LAST_STORAGE_ERROR);
+      return null;
+    }
+    const rows = await res.json();
+    if(!rows.length) return null;
+    return rows[0].value; // jsonb column — already a real object, no JSON.parse needed
+  }catch(e){
+    LAST_STORAGE_ERROR = `GET ${key} → ${e.message}`;
+    console.error(LAST_STORAGE_ERROR);
+    return null;
+  }
+}
+async function kset(key, val){
+  try{
+    const res = await fetch(`${SUPA_URL}/rest/v1/kv_store`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify([{ key, value: val, updated_at: new Date().toISOString() }])
+    });
+    if(!res.ok){
+      LAST_STORAGE_ERROR = `SET ${key} → HTTP ${res.status}: ${await res.text()}`;
+      console.error(LAST_STORAGE_ERROR);
+      return false;
+    }
+    return true;
+  }catch(e){
+    LAST_STORAGE_ERROR = `SET ${key} → ${e.message}`;
+    console.error(LAST_STORAGE_ERROR);
+    return false;
+  }
+}
+async function testStorageConnection(){
+  const testKey = '__connection_test__';
+  const testVal = { pingedAt: Date.now() };
+  const setOk = await kset(testKey, testVal);
+  if(!setOk) return { ok:false, stage:'write', error: LAST_STORAGE_ERROR };
+  const readBack = await kget(testKey);
+  if(!readBack) return { ok:false, stage:'read', error: LAST_STORAGE_ERROR };
+  return { ok:true };
+}
+
+function defaultDirectorPass(){ return 'Director@123'; }
+function defaultHodPass(deptIdx){
+  const d = STRUCT.departments[deptIdx];
+  return (d ? d.shortCode : 'HOD') + '@123';
+}
+function slugifyId(name){ return slugify(name); }
+
+/* ===================== STRUCTURE BOOTSTRAP ===================== */
+async function initStructure(){
+  let depts = await kget('structure_departments');
+  if(!depts){
+    depts = JSON.parse(JSON.stringify(RAW_DATA.departments));
+    await kset('structure_departments', depts);
+  }
+  let comps = await kget('structure_competencies');
+  if(!comps){
+    comps = JSON.parse(JSON.stringify(RAW_DATA.competencies));
+    await kset('structure_competencies', comps);
+  }
+  let admins = await kget('structure_admins');
+  if(!admins){
+    admins = [
+      {id:'director', name:'Director', passcode:'Director@123', deptSlug:null},
+      {id:'subhash-sakore', name:'Subhash Sakore', passcode:'ss@123', deptSlug:null},
+      {id:'ram-phuge', name:'Ram Phuge', passcode:'rp@123', deptSlug:null}
+    ];
+    await kset('structure_admins', admins);
+  } else {
+    // Migrate known un-edited defaults from earlier versions of this tool
+    // to the latest requested naming/passcodes, without touching anything
+    // the Director has since customised.
+    let changed = false;
+    const dir = admins.find(a=>a.id==='director');
+    if(dir && dir.name === 'Director / HR Admin'){ dir.name = 'Director'; changed = true; }
+    const ss = admins.find(a=>a.id==='subhash-sakore');
+    if(ss && ss.passcode === 'Subhash@123'){ ss.passcode = 'ss@123'; changed = true; }
+    const rp = admins.find(a=>a.id==='ram-phuge');
+    if(rp && rp.passcode === 'Ram@123'){ rp.passcode = 'rp@123'; changed = true; }
+    if(changed) await kset('structure_admins', admins);
+  }
+  let trainers = await kget('structure_trainers');
+  if(!trainers){ trainers = []; await kset('structure_trainers', trainers); }
+  STRUCT.departments = depts;
+  STRUCT.competencies = comps;
+  STRUCT.admins = admins;
+  STRUCT.trainers = trainers;
+  DEPTS = depts.map(d => d.name);
+  COMP = comps;
+}
+async function saveStructure(){
+  await kset('structure_departments', STRUCT.departments);
+  await kset('structure_competencies', STRUCT.competencies);
+  DEPTS = STRUCT.departments.map(d => d.name);
+  COMP = STRUCT.competencies;
+  // structural change invalidates cached per-department data
+  STANDARDS_CACHE = {};
+  SELFRATE_CACHE = {};
+  ASSESSOR_CACHE = {};
+  dirStandardsDept = 0; dirRatingsDept = 0;
+  dashFilterDept = 'all'; calFilterDept = 'all';
+}
+async function saveAdmins(){
+  await kset('structure_admins', STRUCT.admins);
+}
+async function saveTrainers(){
+  await kset('structure_trainers', STRUCT.trainers);
+}
+async function loadTrainingPlans(){
+  return (await kget('training_plans')) || [];
+}
+async function saveTrainingPlans(plans){
+  await kset('training_plans', plans);
+}
+function findDeptIndexBySlug(slug){
+  if(!slug) return null;
+  const idx = STRUCT.departments.findIndex(d => d.slug === slug);
+  return idx >= 0 ? idx : null;
+}
+
+/* ===================== APP STATE ===================== */
+let CURRENT = null; // {role:'director'|'hod', deptIndex, name}
+let STANDARDS_CACHE = {};   // deptIdx -> {code:score}
+let SELFRATE_CACHE = {};    // deptIdx -> {name, status, savedAt, submittedAt, scores:{code:score}}
+let ASSESSOR_CACHE = {};    // deptIdx -> {scores:{code:score}, assessedBy, assessedAt} — Director's own rating
+let activeView = null;
+let dirStandardsDept = 0;
+let dirStandardsCluster = 'functional';
+let dirRatingsDept = 0;
+let dirRatingsCluster = 'functional';
+let dashFilterDept = 'all';
+let dashFilterCluster = 'all';
+let calFilterDept = 'all';
+let hodCluster = 'functional';
+
+/* ===================== LOGIN ===================== */
+function populateHodDeptSelect(){
+  const sel = document.getElementById('hodDept');
+  sel.innerHTML = DEPTS.map((d,i)=>`<option value="${i}">${d}</option>`).join('');
+}
+function populateAdminSelect(){
+  const sel = document.getElementById('adminSelect');
+  sel.innerHTML = STRUCT.admins.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+}
+function setLoginRole(role){
+  document.getElementById('roleBtnDirector').classList.toggle('active', role==='director');
+  document.getElementById('roleBtnHod').classList.toggle('active', role==='hod');
+  document.getElementById('director-login-fields').classList.toggle('hidden', role!=='director');
+  document.getElementById('hod-login-fields').classList.toggle('hidden', role!=='hod');
+  document.getElementById('login-error').textContent = '';
+  const hint = document.getElementById('loginHint');
+  if(role==='director'){
+    hint.innerHTML = 'First time here? Pick your name, then use the default password shown to you in <b>Manage Access</b> (e.g. Director@123). Change it anytime after signing in.';
+  } else {
+    hint.innerHTML = 'First time here? Default passcode is your department code + <b>@123</b> (e.g. Accounts &amp; Finance → <b>ACF@123</b>). Ask your Director/Admin if it has been changed.';
+  }
+  window.__loginRole = role;
+}
+async function attemptLogin(){
+  const role = window.__loginRole || 'director';
+  const errBox = document.getElementById('login-error');
+  errBox.textContent = '';
+  if(role === 'director'){
+    const adminId = document.getElementById('adminSelect').value;
+    const admin = STRUCT.admins.find(a=>a.id===adminId);
+    const pass = document.getElementById('dirPass').value.trim();
+    if(!admin || pass !== String(admin.passcode).trim()){
+      errBox.textContent = 'Incorrect password for that name. Please try again.';
+      return;
+    }
+    CURRENT = {role:'director', name: admin.name, adminId: admin.id, deptIndex: findDeptIndexBySlug(admin.deptSlug)};
+    dirStandardsCluster = 'functional'; dirRatingsCluster = 'functional'; structClusterTab = 'functional';
+    dirStandardsDept = 0; dirRatingsDept = 0; dashFilterDept = 'all'; dashFilterCluster = 'all'; calFilterDept = 'all';
+  } else {
+    const deptIdx = parseInt(document.getElementById('hodDept').value, 10);
+    const pass = document.getElementById('hodPass').value.trim();
+    let stored = await kget('auth_dept_pass_' + slugFor(deptIdx));
+    if(stored === null) stored = defaultHodPass(deptIdx);
+    if(pass !== stored.trim()){
+      errBox.textContent = `Incorrect passcode for ${DEPTS[deptIdx]}. Please check with your Director/Admin, or use the default (${defaultHodPass(deptIdx)}) if it has not been changed.`;
+      return;
+    }
+    CURRENT = {role:'hod', deptIndex: deptIdx, name: DEPTS[deptIdx]};
+    hodCluster = 'functional';
+  }
+  document.getElementById('screen-login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  const showHodNav = (role === 'hod') || (role === 'director' && CURRENT.deptIndex != null);
+  document.getElementById('navItemsDirector').classList.toggle('hidden', role!=='director');
+  document.getElementById('navItemsHod').classList.toggle('hidden', !showHodNav);
+  renderWho();
+  if(role === 'director'){
+    await preloadAllStandards();
+    await preloadAllSelfRates();
+    if(CURRENT.deptIndex != null){
+      await loadStandardsFor(CURRENT.deptIndex);
+      await loadSelfRateFor(CURRENT.deptIndex);
+    }
+    showView('d-overview');
+  } else {
+    await loadStandardsFor(CURRENT.deptIndex); // needed only to know count, not shown
+    await loadSelfRateFor(CURRENT.deptIndex);
+    showView('h-rate');
+  }
+}
+function logout(){
+  CURRENT = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('screen-login').classList.remove('hidden');
+  document.getElementById('dirPass').value = '';
+  document.getElementById('hodPass').value = '';
+  populateHodDeptSelect();
+  populateAdminSelect();
+}
+function renderWho(){
+  const box = document.getElementById('whoBox');
+  if(CURRENT.role === 'director'){
+    const extra = CURRENT.deptIndex != null ? ` + HOD for ${DEPTS[CURRENT.deptIndex]}` : '';
+    box.innerHTML = `<b>${CURRENT.name}</b>Full access · all departments${extra}`;
+  } else {
+    box.innerHTML = `<b>${CURRENT.name}</b>HOD self-assessment access`;
+  }
+}
+
+/* ===================== DATA LOAD HELPERS ===================== */
+function baselineReq(c, deptIdx){
+  const slug = slugFor(deptIdx);
+  return (c.req && slug && c.req[slug] != null) ? c.req[slug] : 3;
+}
+async function loadStandardsFor(deptIdx){
+  if(STANDARDS_CACHE[deptIdx]) return STANDARDS_CACHE[deptIdx];
+  const stored = await kget('standards_' + slugFor(deptIdx));
+  const merged = {};
+  COMP.forEach(c => { merged[c.code] = (stored && stored[c.code] != null) ? stored[c.code] : baselineReq(c, deptIdx); });
+  STANDARDS_CACHE[deptIdx] = merged;
+  return merged;
+}
+async function loadSelfRateFor(deptIdx){
+  if(SELFRATE_CACHE[deptIdx]) return SELFRATE_CACHE[deptIdx];
+  const stored = await kget('selfrate_' + slugFor(deptIdx));
+  const obj = stored || {status:'not_started', scores:{}, savedAt:null, submittedAt:null, hodName:''};
+  SELFRATE_CACHE[deptIdx] = obj;
+  return obj;
+}
+async function loadAssessorFor(deptIdx){
+  if(ASSESSOR_CACHE[deptIdx]) return ASSESSOR_CACHE[deptIdx];
+  const stored = await kget('assessor_' + slugFor(deptIdx));
+  const obj = stored || {scores:{}, assessedBy:null, assessedAt:null};
+  ASSESSOR_CACHE[deptIdx] = obj;
+  return obj;
+}
+async function preloadAllStandards(){
+  await Promise.all(DEPTS.map((d,i) => loadStandardsFor(i)));
+}
+async function preloadAllSelfRates(){
+  await Promise.all(DEPTS.map((d,i) => Promise.all([loadSelfRateFor(i), loadAssessorFor(i)])));
+}
+/* Force-fresh reloads: bypass in-memory cache so the Director always sees the
+   latest data saved by HODs in other tabs/devices/sessions. Used by every
+   Director-facing read view (Overview, Ratings, Dashboard, Calendar).
+   IMPORTANT: a failed or empty storage read must never overwrite data we
+   already hold in memory (e.g. from a manual file import, or a save earlier
+   in this session) — it only updates the cache when storage actually
+   returned something. This makes the app resilient to storage being flaky
+   or temporarily unavailable, instead of flashing back to "not started". */
+async function loadStandardsForFresh(deptIdx){
+  const stored = await kget('standards_' + slugFor(deptIdx));
+  if(stored){
+    const merged = {};
+    COMP.forEach(c => { merged[c.code] = (stored[c.code] != null) ? stored[c.code] : baselineReq(c, deptIdx); });
+    STANDARDS_CACHE[deptIdx] = merged;
+  } else if(!STANDARDS_CACHE[deptIdx]){
+    const merged = {};
+    COMP.forEach(c => { merged[c.code] = baselineReq(c, deptIdx); });
+    STANDARDS_CACHE[deptIdx] = merged;
+  }
+  return STANDARDS_CACHE[deptIdx];
+}
+async function loadSelfRateForFresh(deptIdx){
+  const stored = await kget('selfrate_' + slugFor(deptIdx));
+  if(stored){
+    SELFRATE_CACHE[deptIdx] = stored;
+  } else if(!SELFRATE_CACHE[deptIdx]){
+    SELFRATE_CACHE[deptIdx] = {status:'not_started', scores:{}, savedAt:null, submittedAt:null, hodName:''};
+  }
+  return SELFRATE_CACHE[deptIdx];
+}
+async function loadAssessorForFresh(deptIdx){
+  const stored = await kget('assessor_' + slugFor(deptIdx));
+  if(stored){
+    ASSESSOR_CACHE[deptIdx] = stored;
+  } else if(!ASSESSOR_CACHE[deptIdx]){
+    ASSESSOR_CACHE[deptIdx] = {scores:{}, assessedBy:null, assessedAt:null};
+  }
+  return ASSESSOR_CACHE[deptIdx];
+}
+async function refreshAllDirectorData(){
+  await Promise.all(DEPTS.map((d,i) => Promise.all([
+    loadStandardsForFresh(i),
+    loadSelfRateForFresh(i),
+    loadAssessorForFresh(i)
+  ])));
+}
+async function saveStandards(deptIdx, obj){
+  STANDARDS_CACHE[deptIdx] = obj;
+  await kset('standards_' + slugFor(deptIdx), obj);
+}
+async function saveSelfRate(deptIdx, obj){
+  SELFRATE_CACHE[deptIdx] = obj;
+  await kset('selfrate_' + slugFor(deptIdx), obj);
+}
+
+/* ===================== NAV ===================== */
+function showView(viewId){
+  const isSameView = (activeView === viewId);
+  const scrollY = window.scrollY;
+  activeView = viewId;
+  document.querySelectorAll('.navitem').forEach(el=>{
+    el.classList.toggle('active', el.dataset.view === viewId);
+  });
+  const main = document.getElementById('mainArea');
+  if(!isSameView){
+    main.innerHTML = '<div class="empty-state">Loading…</div>';
+  }
+  renderView(viewId).then(html => {
+    main.innerHTML = html;
+    afterRenderHooks(viewId);
+    if(isSameView){
+      // A save/refresh action on the view you're already on shouldn't
+      // yank you back to the top of the page — only genuine navigation
+      // to a different screen does that.
+      window.scrollTo(0, scrollY);
+    }
+  });
+}
+
+async function renderView(viewId){
+  switch(viewId){
+    case 'd-overview': return await viewDirectorOverview();
+    case 'd-standards': return await viewDirectorStandards();
+    case 'd-ratings': return await viewDirectorRatings();
+    case 'd-dashboard': return await viewDirectorDashboard();
+    case 'd-calendar': return await viewDirectorCalendar();
+    case 'd-access': return await viewDirectorAccess();
+    case 'd-structure': return viewDirectorStructure();
+    case 'd-trainers': return viewTrainerDirectory();
+    case 'd-backup': return await viewDirectorBackup();
+    case 'h-rate': return await viewHodRate();
+    case 'h-status': return await viewHodStatus();
+    case 'guide': return viewProcessGuide();
+    default: return '<div class="empty-state">Not found.</div>';
+  }
+}
+
+/* ===================== SHARED RENDER HELPERS ===================== */
+function gapBadge(gap){
+  if(gap >= 2) return `<span class="badge danger">Gap ${gap}</span>`;
+  if(gap === 1) return `<span class="badge warn">Gap ${gap}</span>`;
+  if(gap === 0) return `<span class="badge good">On target</span>`;
+  return `<span class="badge neutral">+${Math.abs(gap)} above</span>`;
+}
+function gapClass(gap){
+  if(gap >= 1) return 'gap-pos';
+  if(gap === 0) return 'gap-zero';
+  return 'gap-neg';
+}
+function actionForGap(gap){
+  if(gap >= 2) return 'Urgent — structured workshop within 60 days';
+  if(gap === 1) return 'Recommended — skill refresher / coaching';
+  if(gap === 0) return 'On track — maintain current level';
+  return 'Exceeds requirement — consider as mentor / stretch role';
+}
+function tabsHtml(items, activeKey, onClickFnName, extraArg){
+  return `<div class="tabs">${items.map(it => {
+    const key = it.key !== undefined ? it.key : it;
+    const label = it.label !== undefined ? it.label : it;
+    const color = it.color;
+    const isActive = key === activeKey;
+    return `<div class="tab ${isActive?'active':''}" onclick="${onClickFnName}('${key}'${extraArg!==undefined? ", '"+extraArg+"'":''})">${color?`<span class="dot" style="background:${color}"></span>`:''}${label}</div>`;
+  }).join('')}</div>`;
+}
+function deptSelectHtml(id, selectedIdx, onChangeFnName){
+  return `<select id="${id}" onchange="${onChangeFnName}(this.value)">
+    ${DEPTS.map((d,i)=>`<option value="${i}" ${i==selectedIdx?'selected':''}>${d}</option>`).join('')}
+  </select>`;
+}
+function submissionStatusPill(status){
+  if(status === 'submitted') return `<span class="status-pill" style="background:var(--good-bg); color:var(--good);">● Submitted</span>`;
+  if(status === 'draft') return `<span class="status-pill" style="background:var(--warn-bg); color:var(--warn);">● In progress</span>`;
+  return `<span class="status-pill" style="background:#EDEFF5; color:var(--ink-soft);">● Not started</span>`;
+}
+function avg(arr){ if(!arr.length) return 0; return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function fmt1(n){ return (Math.round(n*10)/10).toFixed(1); }
+
+/* Company-wide view: for each of the 33 competencies, how many HODs
+   (across all departments) currently have a gap >= threshold, based
+   strictly on Director ratings. This is what tells you "one workshop
+   for 7 HODs" vs "one-on-one coaching for 1 HOD". */
+function companyWideCompetencyGaps(threshold){
+  threshold = threshold || 1;
+  const byCode = {};
+  COMP.forEach(c => { byCode[c.code] = {comp:c, entries:[]}; });
+  DEPTS.forEach((d,i)=>{
+    gapRowsForDept(i).forEach(r=>{
+      if(r.gap != null && r.gap >= threshold){
+        byCode[r.code].entries.push({deptIdx:i, dept:d, gap:r.gap});
+      }
+    });
+  });
+  return Object.values(byCode)
+    .filter(x => x.entries.length > 0)
+    .map(x => ({
+      code: x.comp.code, name: x.comp.name, cluster: x.comp.cluster, clusterLabel: x.comp.clusterLabel,
+      count: x.entries.length, avgGap: avg(x.entries.map(e=>e.gap)), depts: x.entries.map(e=>e.dept)
+    }))
+    .sort((a,b) => b.count - a.count || b.avgGap - a.avgGap);
+}
+
+/* Compute gap rows for a department: [{code,name,cluster,clusterLabel,required,self,gap}] */
+function gapRowsForDept(deptIdx){
+  const std = STANDARDS_CACHE[deptIdx] || {};
+  const sr = SELFRATE_CACHE[deptIdx] || {scores:{}};
+  const ar = ASSESSOR_CACHE[deptIdx] || {scores:{}};
+  return COMP.map(c => {
+    const required = std[c.code] != null ? std[c.code] : baselineReq(c, deptIdx);
+    const self = sr.scores ? sr.scores[c.code] : undefined;
+    const assessor = ar.scores ? ar.scores[c.code] : undefined;
+    // "Gap" is defined strictly as Required minus the Director's own rating.
+    // The HOD's self-rating is shown for reference/context only — it is
+    // never used to compute the official gap. Until the Director rates a
+    // competency, its gap is simply not yet available (null), not a
+    // self-based placeholder.
+    const gap = (assessor != null) ? (required - assessor) : null;
+    return {code:c.code, name:c.name, cluster:c.cluster, clusterLabel:c.clusterLabel, required, self, assessor, gap};
+  });
+}
+
+/* ===================== DIRECTOR: OVERVIEW ===================== */
+async function viewDirectorOverview(){
+  await refreshAllDirectorData();
+  const submitted = DEPTS.map((d,i)=>SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status === 'submitted');
+  const submittedCount = submitted.filter(Boolean).length;
+  const awaitingReview = DEPTS.filter((d,i)=>{
+    const sr = SELFRATE_CACHE[i];
+    const ar = ASSESSOR_CACHE[i];
+    return sr && sr.status === 'submitted' && (!ar || !ar.scores || Object.keys(ar.scores).length === 0);
+  }).length;
+  let allGaps = [];
+  DEPTS.forEach((d,i)=>{
+    gapRowsForDept(i).forEach(r=>{ if(r.gap != null) allGaps.push(r.gap); });
+  });
+  const avgGap = allGaps.length ? avg(allGaps) : 0;
+  const redFlags = allGaps.filter(g => g >= 2).length;
+
+  const rows = DEPTS.map((d,i)=>{
+    const sr = SELFRATE_CACHE[i] || {status:'not_started'};
+    const rows2 = gapRowsForDept(i).filter(r=>r.gap!=null);
+    const deptAvgGap = rows2.length ? fmt1(avg(rows2.map(r=>r.gap))) : '—';
+    const canReview = sr.status !== 'not_started';
+    return `<tr>
+      <td><b>${d}</b></td>
+      <td>${submissionStatusPill(sr.status)}</td>
+      <td>${sr.hodName ? sr.hodName : '<span class="muted">—</span>'}</td>
+      <td>${sr.submittedAt ? new Date(sr.submittedAt).toLocaleDateString('en-IN') : '<span class="muted">—</span>'}</td>
+      <td>${deptAvgGap}</td>
+      <td>${canReview ? `<button class="btn btn-ghost small" style="padding:5px 10px; font-size:11.5px;" onclick="dirRatingsDept=${i}; showView('d-ratings')">Review →</button>` : ''}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="topbar row between">
+      <div>
+        <h2>Overview</h2>
+        <div class="desc">Organisation-wide snapshot across all 10 HOD roles and 33 competencies (Functional, Leadership, Strategic, Behavioural).</div>
+      </div>
+      <button class="btn btn-ghost" onclick="showView('d-overview')">↻ Refresh</button>
+    </div>
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="lbl">Departments</div><div class="val">${DEPTS.length}</div><div class="sub">Roles with defined standards</div></div>
+      <div class="card kpi"><div class="lbl">Self-Assessments Submitted</div><div class="val">${submittedCount} / ${DEPTS.length}</div><div class="sub">${DEPTS.length-submittedCount} pending</div></div>
+      <div class="card kpi"><div class="lbl">Awaiting Your Rating</div><div class="val">${awaitingReview}</div><div class="sub">Submitted, not yet reviewed by you</div></div>
+      <div class="card kpi"><div class="lbl">Average Gap (org-wide)</div><div class="val">${allGaps.length? fmt1(avgGap):'—'}</div><div class="sub">Required minus your rating (Director-rated competencies only)</div></div>
+      <div class="card kpi"><div class="lbl">Critical Gaps (≥2)</div><div class="val">${redFlags}</div><div class="sub">Across all submitted competencies</div></div>
+    </div>
+    <div class="panel card">
+      <h3>Department Submission Tracker</h3>
+      <div class="panel-desc">Live status of self-assessment completion, pulled from each HOD's login.</div>
+      <table>
+        <thead><tr><th>Department</th><th>Status</th><th>Submitted by</th><th>Date</th><th>Avg Gap</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <footer class="foot-note">Tip: use <b>Set Standards</b> to define required proficiency per role, then track progress here as HODs complete their self-assessments.</footer>
+  `;
+}
+
+/* ===================== DIRECTOR: SET STANDARDS ===================== */
+let STD_COMMENT_CACHE = {};
+async function viewDirectorStandards(){
+  await Promise.all(DEPTS.map(async (d,i) => {
+    await loadStandardsFor(i);
+    if(STD_COMMENT_CACHE[i] === undefined){
+      STD_COMMENT_CACHE[i] = (await kget('std_comment_' + slugFor(i))) || '';
+    }
+  }));
+  const comps = compsByCluster(dirStandardsCluster);
+  const meta = clusterMeta(dirStandardsCluster);
+
+  const headerCells = DEPTS.map((d,i)=>`<th style="min-width:130px; text-align:center;">${d}</th>`).join('');
+
+  const rows = comps.map(c => {
+    const cells = DEPTS.map((d,i)=>{
+      const std = STANDARDS_CACHE[i] || {};
+      const pending = (PENDING_STD_EDITS[i] && PENDING_STD_EDITS[i][c.code] != null) ? PENDING_STD_EDITS[i][c.code] : null;
+      const val = pending != null ? pending : std[c.code];
+      return `<td style="text-align:center;">
+        <input type="number" min="1" max="5" step="1" class="score-input" id="std_${i}_${c.code}" value="${val}" onchange="onStdInputChange(${i}, '${c.code}', this.value)">
+      </td>`;
+    }).join('');
+    return `<tr>
+      <td style="min-width:280px;"><span class="badge neutral">${c.code}</span> <b>${c.name}</b><div class="small muted" style="margin-top:3px;max-width:340px;">${c.definition}</div></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  const footerCells = DEPTS.map((d,i)=>`<td style="text-align:center; padding-top:14px; vertical-align:top;">
+    <textarea id="stdComment_${i}" placeholder="Notes for this department (optional)" rows="2" style="width:100%; font-size:11px; padding:6px; border-radius:6px; border:1px solid #D6D2C4; resize:vertical; margin-bottom:6px;">${STD_COMMENT_CACHE[i] || ''}</textarea>
+    <button class="btn btn-primary small" style="padding:7px 12px; font-size:12px; width:100%;" onclick="saveStandardsForDept(${i})">Save</button>
+    <button class="btn btn-ghost small" style="padding:5px 10px; font-size:11px; width:100%; margin-top:5px;" onclick="resetStandardsToDefault(${i})">Reset</button>
+    <div class="small" id="stdMsg_${i}" style="min-height:16px; margin-top:4px; color:var(--good);"></div>
+  </td>`).join('');
+
+  return `
+    <div class="topbar">
+      <h2>Set Standards</h2>
+      <div class="desc">Define the <b>minimum required proficiency (1–5)</b> for each competency, per department/HOD role. Edit any cell, add a note if useful, then hit <b>Save</b> under that department's column — each column saves independently.</div>
+    </div>
+    ${tabsHtml(CLUSTERS, dirStandardsCluster, 'onStdClusterChange')}
+    <div class="panel card">
+      <h3 style="color:${meta.color}">${meta.label}</h3>
+      <div class="panel-desc">Required score legend: 1 = Critically below · 2 = Below expectation · 3 = Meets (basic) · 4 = Exceeds · 5 = Exceptional / role model.</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th style="min-width:280px;">Competency</th>${headerCells}</tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr>${`<td></td>` + footerCells}</tr></tfoot>
+        </table>
+      </div>
+    </div>
+  `;
+}
+function onStdClusterChange(k){ dirStandardsCluster = k; showView('d-standards'); }
+let PENDING_STD_EDITS = {};
+function onStdInputChange(deptIdx, code, val){
+  let n = parseInt(val,10);
+  if(isNaN(n)) n = 1;
+  n = Math.max(1, Math.min(5, n));
+  if(!PENDING_STD_EDITS[deptIdx]) PENDING_STD_EDITS[deptIdx] = {};
+  PENDING_STD_EDITS[deptIdx][code] = n;
+}
+async function saveStandardsForDept(deptIdx){
+  const edits = PENDING_STD_EDITS[deptIdx] || {};
+  const std = Object.assign({}, STANDARDS_CACHE[deptIdx], edits);
+  await saveStandards(deptIdx, std);
+  delete PENDING_STD_EDITS[deptIdx];
+  const commentBox = document.getElementById('stdComment_' + deptIdx);
+  if(commentBox){
+    const comment = commentBox.value;
+    STD_COMMENT_CACHE[deptIdx] = comment;
+    await kset('std_comment_' + slugFor(deptIdx), comment);
+  }
+  const msg = document.getElementById('stdMsg_' + deptIdx);
+  if(msg) msg.textContent = '✓ Saved';
+}
+async function resetStandardsToDefault(deptIdx){
+  const ok = confirm(`Reset ${DEPTS[deptIdx]} to the organisation baseline for this cluster? Unsaved edits for this department will be discarded.`);
+  if(!ok) return;
+  const std = Object.assign({}, STANDARDS_CACHE[deptIdx]);
+  compsByCluster(dirStandardsCluster).forEach(c => { std[c.code] = baselineReq(c, deptIdx); });
+  await saveStandards(deptIdx, std);
+  if(PENDING_STD_EDITS[deptIdx]) delete PENDING_STD_EDITS[deptIdx];
+  showView('d-standards');
+}
+
+/* ===================== DIRECTOR: SELF-RATINGS & GAPS ===================== */
+async function viewDirectorRatings(){
+  await loadStandardsForFresh(dirRatingsDept);
+  await loadSelfRateForFresh(dirRatingsDept);
+  await loadAssessorForFresh(dirRatingsDept);
+  const sr = SELFRATE_CACHE[dirRatingsDept];
+  const comps = compsByCluster(dirRatingsCluster);
+  const meta = clusterMeta(dirRatingsCluster);
+  const std = STANDARDS_CACHE[dirRatingsDept];
+
+  if(!sr || sr.status === 'not_started'){
+    return `
+      <div class="topbar">
+        <h2>Self-Ratings &amp; Gaps</h2>
+        <div class="desc">Compare each HOD's self-assessment against the required standard you set, then add your own rating to finalise the gap.</div>
+      </div>
+      <div class="toolbar">
+        <div><label class="small muted" style="display:block;margin-bottom:4px;">Department / Role</label>${deptSelectHtml('ratDeptSelect', dirRatingsDept, 'onRatDeptChange')}</div>
+        <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+          ${submissionStatusPill(sr?sr.status:'not_started')}
+          <button class="btn btn-ghost" onclick="showView('d-ratings')">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="card empty-state">
+        <div class="big">🕓</div>
+        <div><b>${DEPTS[dirRatingsDept]}</b> has not started their self-assessment yet.</div>
+        <div class="small">This section will populate automatically once the HOD logs in and submits. If you know they've submitted and it's still not showing, click ↻ Refresh above — and double-check you and the HOD are both using the same <b>published</b> link.</div>
+      </div>
+      <div class="panel card">
+        <h3>Or load their submission directly</h3>
+        <div class="panel-desc">If the HOD has downloaded and sent you their <b>Submission_*.json</b> file (via email/WhatsApp), load it here — this works instantly even if the automatic sync above isn't showing it yet.</div>
+        <input type="file" accept="application/json" id="importSubmissionInput" onchange="handleImportSubmission(event)">
+        <div id="importSubmissionMsg" class="small" style="min-height:18px; margin-top:8px;"></div>
+      </div>`;
+  }
+
+  const ar = ASSESSOR_CACHE[dirRatingsDept] || {scores:{}};
+  if(!ASSESSOR_PENDING[dirRatingsDept]) ASSESSOR_PENDING[dirRatingsDept] = Object.assign({}, ar.scores);
+  const anyAssessorSaved = Object.keys(ar.scores || {}).length > 0;
+
+  const gapRows = gapRowsForDept(dirRatingsDept);
+  const gapByCode = {};
+  gapRows.forEach(r => gapByCode[r.code] = r);
+
+  const rows = comps.map(c=>{
+    const required = std[c.code];
+    const self = sr.scores[c.code];
+    const pendingVal = ASSESSOR_PENDING[dirRatingsDept][c.code];
+    const g = gapByCode[c.code];
+    const gap = g ? g.gap : null;
+    const ratingButtons = [1,2,3,4,5].map(n=>`<button class="${pendingVal===n?'sel':''}" data-val="${n}" onclick="onAssessorChange(${dirRatingsDept}, '${c.code}', ${n}, this)" style="width:28px;height:28px;font-size:12px;padding:0;">${n}</button>`).join('');
+    return `<tr>
+      <td style="width:56px;"><span class="badge neutral">${c.code}</span></td>
+      <td style="min-width:180px;"><b>${c.name}</b></td>
+      <td style="width:70px;text-align:center;">${required}</td>
+      <td style="width:70px;text-align:center;">${self!=null?self:'<span class="muted">—</span>'}</td>
+      <td style="width:210px; background:var(--gold-100);">
+        <div class="scale" style="gap:4px; margin:0;">${ratingButtons}</div>
+      </td>
+      <td style="width:100px;" class="gap-cell ${gap!=null?gapClass(gap):''}">
+        ${gap!=null?(gap>0?'+'+gap:gap):'<span class="small muted" style="font-weight:400;">Not yet rated</span>'}
+      </td>
+      <td style="width:190px;">${gap!=null?gapBadge(gap):''}</td>
+    </tr>`;
+  }).join('');
+
+  const reviewComment = await kget('review_comment_' + slugFor(dirRatingsDept)) || '';
+
+  return `
+    <div class="topbar">
+      <h2>Self-Ratings &amp; Gaps</h2>
+      <div class="desc">Three steps: <b>1)</b> the HOD self-rates (already done below, shown for reference) → <b>2)</b> you click a score in the highlighted <b>Director's Rating</b> column for each competency → <b>3)</b> hit Save. <b>Gap = Required Standard − Your Rating.</b> Self-ratings are never counted toward the Gap or the Training Calendar — only your rating is.</div>
+      <div class="callout"><span class="callout-ic">📏</span><div><b>How Gap works:</b> until you rate a competency, its Gap shows "Not yet rated" — it does <i>not</i> fall back to the HOD's self-score. This keeps the Gap, Dashboard and Training Calendar based entirely on your assessment.</div></div>
+    </div>
+    <div class="toolbar">
+      <div><label class="small muted" style="display:block;margin-bottom:4px;">Department / Role</label>${deptSelectHtml('ratDeptSelect', dirRatingsDept, 'onRatDeptChange')}</div>
+      <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+        ${submissionStatusPill(sr.status)}
+        <span class="small muted">${sr.hodName?('Submitted by '+sr.hodName):''} ${sr.submittedAt?('· '+new Date(sr.submittedAt).toLocaleDateString('en-IN')):''}</span>
+        <button class="btn btn-ghost" onclick="showView('d-ratings')">↻ Refresh</button>
+        <label class="btn btn-ghost" style="cursor:pointer; margin:0;">⇪ Load from file<input type="file" accept="application/json" id="importSubmissionInput2" onchange="handleImportSubmission(event)" style="display:none;"></label>
+      </div>
+    </div>
+    ${tabsHtml(CLUSTERS, dirRatingsCluster, 'onRatClusterChange')}
+    ${ratingsImportMsg ? `<div class="callout" style="background:var(--good-bg); border-color:var(--good);">${ratingsImportMsg}</div>` : ''}
+    ${!anyAssessorSaved ? `<div class="callout"><span class="callout-ic">👉</span><div>You haven't rated <b>${DEPTS[dirRatingsDept]}</b> yet — click a score in the gold <b>Director's Rating</b> column below for each competency, then <b>Save Your Ratings</b>. Until you do, the Gap column uses their self-rating as a placeholder.</div></div>` : ''}
+    <div class="panel card">
+      <h3 style="color:${meta.color}">${meta.label}</h3>
+      <table>
+        <thead><tr><th>Code</th><th>Competency</th><th>Required</th><th>Self</th><th style="background:var(--navy-900);">Director's Rating</th><th>Gap</th><th>Signal</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="row gap12" style="margin-top:14px;">
+        <button class="btn btn-primary" onclick="saveAssessorRatings(${dirRatingsDept})">Save Your Ratings</button>
+        <span id="assessorMsg" class="small" style="color:var(--good);">${assessorMsg}</span>
+      </div>
+    </div>
+    <div class="panel card">
+      <h3>Director's Review Notes</h3>
+      <div class="panel-desc">Private notes for <b>${DEPTS[dirRatingsDept]}</b> — useful for the 1:1 conversation and training calendar. Not visible to the HOD.</div>
+      <textarea id="reviewComment" rows="4" style="width:100%; font-size:13px; padding:10px; border-radius:8px; border:1px solid #D6D2C4; resize:vertical;" placeholder="e.g. Gap on F4 likely due to lack of ERP training, not capability — prioritise for Q1 workshop.">${reviewComment}</textarea>
+      <div class="row gap12" style="margin-top:10px;">
+        <button class="btn btn-primary" onclick="saveReviewComment(${dirRatingsDept})">Save Note</button>
+        <span id="reviewMsg" class="small" style="color:var(--good);"></span>
+      </div>
+    </div>
+  `;
+}
+let ASSESSOR_PENDING = {};
+let assessorMsg = '';
+function onAssessorChange(deptIdx, code, val, btnEl){
+  if(!ASSESSOR_PENDING[deptIdx]) ASSESSOR_PENDING[deptIdx] = {};
+  ASSESSOR_PENDING[deptIdx][code] = val;
+  // Update just this row's buttons directly — no page re-render, no network
+  // call, no scroll jump. The Gap column intentionally only updates after
+  // "Save Your Ratings" is clicked (it reflects committed, saved decisions).
+  if(btnEl && btnEl.parentElement){
+    btnEl.parentElement.querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('sel', parseInt(b.dataset.val,10) === val);
+    });
+  }
+  if(assessorMsg){ assessorMsg = ''; const m = document.getElementById('assessorMsg'); if(m) m.textContent = ''; }
+}
+async function saveAssessorRatings(deptIdx){
+  const existing = (await kget('assessor_' + slugFor(deptIdx))) || {};
+  const updated = Object.assign({}, existing, {
+    scores: ASSESSOR_PENDING[deptIdx] || {},
+    assessedBy: CURRENT.name,
+    assessedAt: Date.now()
+  });
+  await kset('assessor_' + slugFor(deptIdx), updated);
+  ASSESSOR_CACHE[deptIdx] = updated;
+  assessorMsg = '✓ Your ratings saved — Gap and Training Calendar now use these.';
+  showView('d-ratings');
+}
+async function saveReviewComment(deptIdx){
+  const val = document.getElementById('reviewComment').value;
+  await kset('review_comment_' + slugFor(deptIdx), val);
+  const msg = document.getElementById('reviewMsg');
+  if(msg) msg.textContent = '✓ Note saved';
+}
+function onRatDeptChange(v){ dirRatingsDept = parseInt(v,10); assessorMsg = ''; ratingsImportMsg = ''; showView('d-ratings'); }
+function onRatClusterChange(k){ dirRatingsCluster = k; assessorMsg = ''; ratingsImportMsg = ''; showView('d-ratings'); }
+
+/* ===================== DIRECTOR: ANALYTICS DASHBOARD ===================== */
+async function viewDirectorDashboard(){
+  await refreshAllDirectorData();
+  // Build full gap dataset across departments that have submitted
+  let allRows = [];
+  DEPTS.forEach((d,i)=>{
+    if(SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status !== 'not_started'){
+      gapRowsForDept(i).forEach(r=>{ if(r.gap!=null) allRows.push(Object.assign({deptIdx:i, dept:d}, r)); });
+    }
+  });
+
+  const fRows = allRows.filter(r =>
+    (dashFilterDept === 'all' || parseInt(dashFilterDept,10) === r.deptIdx) &&
+    (dashFilterCluster === 'all' || dashFilterCluster === r.cluster)
+  );
+
+  const kpiAvgGap = fRows.length ? fmt1(avg(fRows.map(r=>r.gap))) : '—';
+  const kpiCritical = fRows.filter(r=>r.gap>=2).length;
+  const kpiOnTrack = fRows.filter(r=>r.gap<=0).length;
+  const kpiTotal = fRows.length;
+
+  // Avg gap by department (bar chart)
+  const byDept = DEPTS.map((d,i)=>{
+    const rows = allRows.filter(r=>r.deptIdx===i && (dashFilterCluster==='all'||dashFilterCluster===r.cluster));
+    return {dept:d, avgGap: rows.length? avg(rows.map(r=>r.gap)) : null};
+  }).filter(x=>x.avgGap!=null);
+  const maxAbsGap = Math.max(1, ...byDept.map(x=>Math.abs(x.avgGap)));
+  const deptBars = byDept.map(x=>{
+    const pct = Math.min(100, Math.abs(x.avgGap)/maxAbsGap*100);
+    const color = x.avgGap>=2?'var(--danger)':(x.avgGap>=1?'var(--warn)':'var(--good)');
+    return `<div class="bar-row">
+      <div class="bar-label">${x.dept}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${color};"></div></div>
+      <div class="bar-val">${fmt1(x.avgGap)}</div>
+    </div>`;
+  }).join('') || '<div class="muted small">No submitted data yet for this filter.</div>';
+
+  // Heatmap: department x cluster avg gap
+  const heatHeader = `<div class="heat-cell" style="background:transparent;color:var(--ink-soft);font-weight:800;">Dept</div>` +
+    CLUSTERS.map(c=>`<div class="heat-cell" style="background:transparent;color:var(--ink-soft);">${c.label.split(' ')[0]}</div>`).join('');
+  const heatRows = DEPTS.map((d,i)=>{
+    const rowCells = CLUSTERS.map(c=>{
+      const rows = allRows.filter(r=>r.deptIdx===i && r.cluster===c.key);
+      if(!rows.length) return `<div class="heat-cell" style="background:#EEECE3;color:#B7B2A0;">—</div>`;
+      const a = avg(rows.map(r=>r.gap));
+      const color = a>=2?'#C0392B':(a>=1?'#D68910':(a>=0?'#1E8449':'#3B4EA3'));
+      return `<div class="heat-cell" style="background:${color};">${fmt1(a)}</div>`;
+    }).join('');
+    return `<div class="heat-cell" style="background:transparent;color:var(--ink);text-align:left;font-weight:700;">${d}</div>${rowCells}`;
+  }).join('');
+
+  // Top priority table
+  const topPriority = allRows
+    .filter(r => (dashFilterDept==='all'||parseInt(dashFilterDept,10)===r.deptIdx) && (dashFilterCluster==='all'||dashFilterCluster===r.cluster))
+    .sort((a,b)=>b.gap-a.gap)
+    .slice(0,15)
+    .map(r=>`<tr>
+      <td><b>${r.dept}</b></td>
+      <td>${r.name}<div class="small muted">${clusterMeta(r.cluster).label}</div></td>
+      <td style="text-align:center;">${r.required}</td>
+      <td style="text-align:center;">${r.self}</td>
+      <td class="gap-cell ${gapClass(r.gap)}" style="text-align:center;">${r.gap>0?'+'+r.gap:r.gap}</td>
+      <td>${actionForGap(r.gap)}</td>
+    </tr>`).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">No data for this filter yet.</td></tr>`;
+
+  // Company-wide view: all 33 competencies, ranked by how many HODs share
+  // the gap — this is what tells you "one workshop covers 7 people" vs
+  // "this is really just a one-person issue".
+  const companyWide = companyWideCompetencyGaps(1);
+  const companyWideRows = companyWide.map((x,idx)=>{
+    const isTop = idx < 5;
+    return `<tr style="${isTop?'background:var(--gold-100);':''}">
+      <td>${isTop?'<span class="badge warn">Priority</span> ':''}<b>${x.name}</b><div class="small muted">${x.clusterLabel} · ${x.code}</div></td>
+      <td style="text-align:center; font-weight:800; font-size:16px;">${x.count}</td>
+      <td style="text-align:center;">${fmt1(x.avgGap)}</td>
+      <td class="small">${x.depts.slice(0,4).join(', ')}${x.depts.length>4?` +${x.depts.length-4} more`:''}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">No Director ratings yet — rate HODs in Self-Ratings &amp; Gaps to populate this.</td></tr>`;
+
+  return `
+    <div class="topbar">
+      <h2>Analytics Dashboard</h2>
+      <div class="desc">Organisation-wide competency gap analysis, based on your ratings (not self-ratings).</div>
+    </div>
+    <div class="toolbar">
+      <div><label class="small muted" style="display:block;margin-bottom:4px;">Department</label>
+        <select id="dashDeptSelect" onchange="onDashDeptChange(this.value)">
+          <option value="all" ${dashFilterDept==='all'?'selected':''}>All Departments</option>
+          ${DEPTS.map((d,i)=>`<option value="${i}" ${dashFilterDept==String(i)?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+      <div><label class="small muted" style="display:block;margin-bottom:4px;">Cluster</label>
+        <select id="dashClusterSelect" onchange="onDashClusterChange(this.value)">
+          <option value="all" ${dashFilterCluster==='all'?'selected':''}>All Clusters</option>
+          ${CLUSTERS.map(c=>`<option value="${c.key}" ${dashFilterCluster===c.key?'selected':''}>${c.label}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-left:auto; display:flex; gap:10px;">
+        <button class="btn btn-ghost" onclick="showView('d-dashboard')">↻ Refresh</button>
+        <button class="btn btn-ghost" onclick="exportGapsCSV()">⬇ Export gap data (CSV)</button>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="lbl">Competencies in view</div><div class="val">${kpiTotal}</div></div>
+      <div class="card kpi"><div class="lbl">Average Gap</div><div class="val">${kpiAvgGap}</div></div>
+      <div class="card kpi"><div class="lbl">Critical (gap ≥2)</div><div class="val">${kpiCritical}</div></div>
+      <div class="card kpi"><div class="lbl">On Track / Exceeding</div><div class="val">${kpiOnTrack}</div></div>
+    </div>
+    <div class="panel card">
+      <h3>Company-Wide Training Needs — All 33 Competencies</h3>
+      <div class="panel-desc">Ranked by how many HODs share the same gap. The gold-highlighted top 5 are where a single workshop helps the most people — the best use of your L&amp;D budget. This list ignores the Department/Cluster filters above (it's always company-wide).</div>
+      <table>
+        <thead><tr><th>Competency</th><th># of HODs</th><th>Avg Gap</th><th>Which Departments</th></tr></thead>
+        <tbody>${companyWideRows}</tbody>
+      </table>
+    </div>
+    <div class="panel card">
+      <h3>Average Gap by Department</h3>
+      <div class="panel-desc">Higher bars indicate a bigger shortfall against required standard for the selected cluster.</div>
+      ${deptBars}
+    </div>
+    <div class="panel card">
+      <h3>Gap Heatmap — Department × Cluster</h3>
+      <div class="panel-desc">Darker red = larger average gap. Grey = not yet rated by you.</div>
+      <div class="heat-grid" style="grid-template-columns: 190px repeat(${CLUSTERS.length}, 1fr);">
+        ${heatHeader}${heatRows}
+      </div>
+    </div>
+    <div class="panel card">
+      <h3>Individual Priorities (filtered view)</h3>
+      <div class="panel-desc">Same data as above, but per HOD instance — useful once you've narrowed to one department.</div>
+      <table>
+        <thead><tr><th>Department</th><th>Competency</th><th>Req.</th><th>Self</th><th>Gap</th><th>Suggested Action</th></tr></thead>
+        <tbody>${topPriority}</tbody>
+      </table>
+    </div>
+  `;
+}
+function onDashDeptChange(v){ dashFilterDept = v; showView('d-dashboard'); }
+function onDashClusterChange(v){ dashFilterCluster = v; showView('d-dashboard'); }
+
+function exportGapsCSV(){
+  let rows = [['Department','Cluster','Code','Competency','Required','Self','Gap','Suggested Action']];
+  DEPTS.forEach((d,i)=>{
+    if(SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status !== 'not_started'){
+      gapRowsForDept(i).forEach(r=>{
+        if(r.gap!=null){
+          rows.push([d, r.clusterLabel, r.code, r.name, r.required, r.self, r.gap, actionForGap(r.gap)]);
+        }
+      });
+    }
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Mangalam_Competency_Gap_Report.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ===================== DIRECTOR: TRAINING CALENDAR ===================== */
+const COMPANY_WIDE_THRESHOLD = 3; // 3+ HODs sharing a gap = one workshop instead of individual coaching
+let TRAINING_PLANS_CACHE = null; // loaded once per session, edited in place, explicit save
+let calMsg = '';
+
+function assignDefaultQuarters(items, forwardQuarters){
+  // Highest-priority items (already sorted) go into the earliest available
+  // quarter first — this respects "don't stretch past quarters, front-load
+  // the most impactful ones now".
+  const nQ = forwardQuarters.length || 1;
+  const per = Math.ceil(items.length / nQ) || 1;
+  return items.map((it, idx) => forwardQuarters[Math.min(nQ-1, Math.floor(idx/per))].index);
+}
+
+async function viewDirectorCalendar(){
+  await refreshAllDirectorData();
+  if(TRAINING_PLANS_CACHE === null){ TRAINING_PLANS_CACHE = await loadTrainingPlans(); }
+  const forwardQuarters = getForwardQuarters();
+
+  // Live company-wide gaps (any count, so we can still show a plan that
+  // has since dropped below threshold rather than losing the Director's
+  // budget/trainer entries).
+  const liveAll = companyWideCompetencyGaps(1);
+  const liveByCode = {}; liveAll.forEach(x => liveByCode[x.code] = x);
+  const liveCompanyWide = liveAll.filter(x => x.count >= COMPANY_WIDE_THRESHOLD);
+  const defaultQuarters = assignDefaultQuarters(liveCompanyWide, forwardQuarters);
+  const defaultQuarterByCode = {};
+  liveCompanyWide.forEach((x,idx) => defaultQuarterByCode[x.code] = defaultQuarters[idx]);
+
+  // Merge: every live company-wide competency, plus any previously saved
+  // plan (even if its gap has since narrowed) — union, keyed by code.
+  const codesInPlay = new Set([...liveCompanyWide.map(x=>x.code), ...TRAINING_PLANS_CACHE.map(p=>p.code)]);
+  const planByCode = {}; TRAINING_PLANS_CACHE.forEach(p => planByCode[p.code] = p);
+
+  const merged = Array.from(codesInPlay).map(code => {
+    const comp = COMP.find(c=>c.code===code);
+    if(!comp) return null;
+    const live = liveByCode[code];
+    const saved = planByCode[code];
+    return {
+      code,
+      name: comp.name,
+      clusterLabel: comp.clusterLabel,
+      count: live ? live.count : (saved ? saved.lastCount || 0 : 0),
+      avgGap: live ? live.avgGap : (saved ? saved.lastAvgGap || 0 : 0),
+      depts: live ? live.depts : (saved ? saved.lastDepts || [] : []),
+      title: saved ? saved.title : suggestedTopic(comp),
+      quarterIndex: saved && saved.quarterIndex != null ? saved.quarterIndex : (defaultQuarterByCode[code] != null ? defaultQuarterByCode[code] : forwardQuarters[0].index),
+      trainerId: saved ? saved.trainerId : null,
+      budget: saved ? saved.budget : 0,
+      notes: saved ? saved.notes : ''
+    };
+  }).filter(Boolean).sort((a,b) => b.count - a.count || b.avgGap - a.avgGap);
+
+  const planRows = merged.map(m=>{
+    const belowThreshold = m.count < COMPANY_WIDE_THRESHOLD;
+    const qOpts = forwardQuarters.map(q=>`<option value="${q.index}" ${q.index===m.quarterIndex?'selected':''}>${q.label}</option>`).join('');
+    const tOpts = `<option value="" ${!m.trainerId?'selected':''}>— Unassigned —</option>` +
+      STRUCT.trainers.map(t=>`<option value="${t.id}" ${t.id===m.trainerId?'selected':''}>${t.name}</option>`).join('');
+    return `<tr data-plan-code="${m.code}" ${belowThreshold?'style="opacity:0.6;"':''}>
+      <td style="min-width:160px;">
+        <b>${m.name}</b>
+        <div class="small muted">${m.clusterLabel} · ${m.code}${belowThreshold?' · <span style="color:var(--warn);">below workshop threshold now</span>':''}</div>
+      </td>
+      <td style="text-align:center; font-weight:800;">${m.count}<div class="small muted" style="font-weight:400;">HODs</div></td>
+      <td style="min-width:220px;"><input type="text" class="plan-title" value="${m.title.replace(/"/g,'&quot;')}" style="width:100%;"></td>
+      <td style="width:150px;"><select class="plan-quarter">${qOpts}</select></td>
+      <td style="width:170px;"><select class="plan-trainer">${tOpts}</select></td>
+      <td style="width:120px;"><input type="number" class="plan-budget" value="${m.budget||0}" min="0" step="1000" style="width:100%;"></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">No company-wide gaps yet (need ${COMPANY_WIDE_THRESHOLD}+ HODs sharing a gap). Rate more HODs in Self-Ratings &amp; Gaps to populate this.</td></tr>`;
+
+  const totalBudget = merged.reduce((s,m)=>s+(Number(m.budget)||0),0);
+  const totalHodsCovered = new Set(merged.flatMap(m=>m.depts)).size;
+
+  // Individual coaching — everyone else (gaps shared by <3 HODs), read-only reference
+  const companyWideCodes = new Set(liveCompanyWide.map(x=>x.code));
+  let individualRows = [];
+  DEPTS.forEach((d,i)=>{
+    gapRowsForDept(i).forEach(r=>{
+      if(r.gap != null && r.gap > 0 && !companyWideCodes.has(r.code)){
+        individualRows.push(Object.assign({dept:d}, r));
+      }
+    });
+  });
+  individualRows.sort((a,b)=>b.gap-a.gap);
+  const indBody = individualRows.slice(0,30).map(r=>`<tr>
+    <td><b>${r.dept}</b></td>
+    <td>${r.name}<div class="small muted">${r.clusterLabel} · ${r.code}</div></td>
+    <td style="text-align:center;">${r.required}</td>
+    <td class="gap-cell ${gapClass(r.gap)}" style="text-align:center;">+${r.gap}</td>
+    <td>${actionForGap(r.gap)}</td>
+  </tr>`).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:20px;">None — every current gap is already covered by a company-wide workshop above.</td></tr>`;
+
+  return `
+    <div class="topbar">
+      <h2>Training Calendar</h2>
+      <div class="desc">Built from your ratings, starting this quarter — no past quarters shown. Set a topic, quarter, trainer and budget for each company-wide gap, then Save.</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="lbl">Company-Wide Programs</div><div class="val">${merged.length}</div></div>
+      <div class="card kpi"><div class="lbl">HODs Covered</div><div class="val">${totalHodsCovered}</div></div>
+      <div class="card kpi"><div class="lbl">Total Budget Planned</div><div class="val" style="font-size:22px;">₹${totalBudget.toLocaleString('en-IN')}</div></div>
+      <div class="card kpi"><div class="lbl">Scheduling Window</div><div class="val" style="font-size:16px;">${forwardQuarters[0].label.split(' ')[0]}–${forwardQuarters[forwardQuarters.length-1].label.split(' ')[0]}</div></div>
+    </div>
+    <div class="panel card">
+      <h3>🎯 Company-Wide Workshops — Priority Order</h3>
+      <div class="panel-desc">Ranked by how many HODs share the gap — top rows are your highest-leverage spend. Every field below is editable.</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Competency (Gap)</th><th>Reach</th><th>Training Topic</th><th>Quarter</th><th>Trainer</th><th>Budget (₹)</th></tr></thead>
+          <tbody id="planTableBody">${planRows}</tbody>
+        </table>
+      </div>
+      <div class="row gap12" style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="saveTrainingPlan()">Save Training Plan</button>
+        <button class="btn btn-ghost" onclick="window.print()">🖨 Print / Save as PDF</button>
+        <span id="calMsg" class="small" style="color:var(--good);">${calMsg}</span>
+      </div>
+    </div>
+    <div class="panel card">
+      <h3>👤 Individual Coaching (reference only)</h3>
+      <div class="panel-desc">Gaps affecting only 1-2 HODs — usually better solved with mentoring or a stretch assignment than a formal budgeted workshop. Not part of the budget above.</div>
+      <table>
+        <thead><tr><th>Department</th><th>Competency</th><th>Req.</th><th>Gap</th><th>Suggested Focus</th></tr></thead>
+        <tbody>${indBody}</tbody>
+      </table>
+      ${individualRows.length>30?`<div class="small muted" style="margin-top:8px;">Showing top 30 of ${individualRows.length}.</div>`:''}
+    </div>
+  `;
+}
+async function saveTrainingPlan(){
+  const rows = document.querySelectorAll('#planTableBody tr[data-plan-code]');
+  const plans = [];
+  rows.forEach(tr=>{
+    const code = tr.dataset.planCode;
+    const title = tr.querySelector('.plan-title').value.trim();
+    const quarterIndex = parseInt(tr.querySelector('.plan-quarter').value,10);
+    const trainerId = tr.querySelector('.plan-trainer').value || null;
+    const budget = Number(tr.querySelector('.plan-budget').value) || 0;
+    const live = companyWideCompetencyGaps(1).find(x=>x.code===code);
+    plans.push({
+      code, title, quarterIndex, trainerId, budget, notes:'',
+      lastCount: live ? live.count : 0,
+      lastAvgGap: live ? live.avgGap : 0,
+      lastDepts: live ? live.depts : []
+    });
+  });
+  TRAINING_PLANS_CACHE = plans;
+  await saveTrainingPlans(plans);
+  calMsg = `✓ Saved — ${plans.length} training program(s), total budget ₹${plans.reduce((s,p)=>s+p.budget,0).toLocaleString('en-IN')}.`;
+  showView('d-calendar');
+}
+
+/* ===================== DIRECTOR: MANAGE ACCESS ===================== */
+let accessMsg = {text:'', ok:true};
+let connTestMsg = '';
+async function runConnectionTest(){
+  connTestMsg = 'Testing…';
+  document.getElementById('connTestMsg').textContent = connTestMsg;
+  const result = await testStorageConnection();
+  if(result.ok){
+    connTestMsg = '✓ Connected — your database is working correctly.';
+  } else {
+    connTestMsg = `✗ Connection failed at ${result.stage} step. Error: ${result.error}`;
+  }
+  showView('d-access');
+}
+
+async function viewDirectorAccess(){
+  const deptPasses = [];
+  for(let i=0;i<DEPTS.length;i++){
+    let p = await kget('auth_dept_pass_' + slugFor(i));
+    deptPasses.push(p || defaultHodPass(i) + '  (default)');
+  }
+  const rows = DEPTS.map((d,i)=>`<tr>
+    <td><b>${d}</b></td>
+    <td><code id="pass_${i}">${deptPasses[i]}</code></td>
+    <td><button class="btn btn-ghost" onclick="resetDeptPass(${i})">Reset passcode</button></td>
+  </tr>`).join('');
+
+  const adminRows = STRUCT.admins.map(a=>{
+    const linkedDept = a.deptSlug ? DEPTS[findDeptIndexBySlug(a.deptSlug)] : '<span class="muted">— Admin only —</span>';
+    const deptOptions = `<option value="">— Admin only —</option>` + STRUCT.departments.map(d=>`<option value="${d.slug}" ${a.deptSlug===d.slug?'selected':''}>${d.name}</option>`).join('');
+    return `<tr>
+      <td><b>${a.name}</b></td>
+      <td><code>${a.passcode}</code></td>
+      <td>
+        <select onchange="setAdminDept('${a.id}', this.value)" style="min-width:200px;">${deptOptions}</select>
+      </td>
+      <td style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="resetAdminPass('${a.id}')">Reset passcode</button>
+        <button class="btn btn-danger-ghost" onclick="promptDeleteAdmin('${a.id}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="topbar">
+      <h2>Manage Access</h2>
+      <div class="desc">Add any number of named Director / Admin users — each gets full access to everything. Optionally link an admin to one department so their login also doubles as that department's HOD self-assessment.</div>
+    </div>
+    <div class="panel card">
+      <h3>Database Connection</h3>
+      <div class="panel-desc">This tool now saves everything to your own database, not Claude's storage. Test the connection anytime — if anything's wrong, this shows the exact error instead of failing silently.</div>
+      <button class="btn btn-primary" onclick="runConnectionTest()">Test Database Connection</button>
+      <div id="connTestMsg" class="small" style="margin-top:10px; min-height:18px;">${connTestMsg}</div>
+    </div>
+    <div class="panel card">
+      <h3>Director / Admin Users</h3>
+      <div class="panel-desc">Everyone listed here has full access: Set Standards, all Self-Ratings &amp; Gaps, Analytics, Training Calendar, Manage Access, and Manage Structure.</div>
+      <table>
+        <thead><tr><th>Name</th><th>Password</th><th>Linked Department (optional — adds HOD self-assessment)</th><th>Actions</th></tr></thead>
+        <tbody>${adminRows}</tbody>
+      </table>
+      <div class="row gap12" style="margin-top:16px; flex-wrap:wrap;">
+        <input type="text" id="newAdminName" placeholder="Full name (e.g. Priya Nair)" style="min-width:240px;">
+        <button class="btn btn-primary" onclick="addAdmin()">+ Add Director / Admin</button>
+      </div>
+      <div id="accessMsg" class="small" style="color:${accessMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:6px;">${accessMsg.text}</div>
+    </div>
+    <div class="panel card">
+      <h3>HOD-Only Passcodes</h3>
+      <div class="panel-desc">Department heads without admin access sign in with their department + this passcode. Reset generates a new random passcode instantly.</div>
+      <table>
+        <thead><tr><th>Department</th><th>Current Passcode</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <footer class="foot-note">⚠ This is a lightweight access-code system suitable for an internal pilot. For company-wide rollout, see the hosting &amp; security notes shared alongside this tool.</footer>
+  `;
+}
+function randomPass(){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for(let i=0;i<6;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+async function resetDeptPass(deptIdx){
+  const ok = confirm(`Reset the passcode for ${DEPTS[deptIdx]}? Their current passcode (default or custom) will stop working immediately, and you'll need to share the new one with them.`);
+  if(!ok) return;
+  const np = randomPass();
+  await kset('auth_dept_pass_' + slugFor(deptIdx), np);
+  showView('d-access');
+}
+
+/* ---- Admin user CRUD ---- */
+async function addAdmin(){
+  const nameInput = document.getElementById('newAdminName');
+  const name = nameInput.value.trim();
+  if(!name){ accessMsg = {text:'Enter a name.', ok:false}; showView('d-access'); return; }
+  const existingIds = STRUCT.admins.map(a=>a.id);
+  let base = slugify(name), id = base, n = 2;
+  while(existingIds.includes(id)){ id = base + '-' + n; n++; }
+  const firstName = name.split(/\s+/)[0];
+  const passcode = firstName + '@' + Math.floor(100 + Math.random()*900);
+  STRUCT.admins.push({id, name, passcode, deptSlug:null});
+  await saveAdmins();
+  accessMsg = {text:`Added "${name}" with full admin access. Default password: ${passcode} — share this with them directly.`, ok:true};
+  showView('d-access');
+}
+async function resetAdminPass(id){
+  const admin = STRUCT.admins.find(a=>a.id===id);
+  if(!admin) return;
+  const ok = confirm(`Reset the password for ${admin.name}? Their current password will stop working immediately.`);
+  if(!ok) return;
+  const firstName = admin.name.split(/\s+/)[0];
+  admin.passcode = firstName + '@' + Math.floor(100 + Math.random()*900);
+  await saveAdmins();
+  accessMsg = {text:`New password for ${admin.name}: ${admin.passcode}`, ok:true};
+  showView('d-access');
+}
+async function setAdminDept(id, deptSlug){
+  const admin = STRUCT.admins.find(a=>a.id===id);
+  if(!admin) return;
+  admin.deptSlug = deptSlug || null;
+  await saveAdmins();
+  accessMsg = {text: deptSlug ? `${admin.name} is now also HOD for ${DEPTS[findDeptIndexBySlug(deptSlug)]}.` : `${admin.name} is now admin-only (no linked department).`, ok:true};
+  // if the admin being edited is the currently logged-in user, refresh their live session immediately
+  if(CURRENT && CURRENT.role === 'director' && CURRENT.adminId === id){
+    CURRENT.deptIndex = findDeptIndexBySlug(deptSlug);
+    const showHodNav = CURRENT.deptIndex != null;
+    document.getElementById('navItemsHod').classList.toggle('hidden', !showHodNav);
+    renderWho();
+    if(CURRENT.deptIndex != null){
+      await loadStandardsFor(CURRENT.deptIndex);
+      await loadSelfRateFor(CURRENT.deptIndex);
+    }
+  }
+  showView('d-access');
+}
+async function promptDeleteAdmin(id){
+  if(STRUCT.admins.length <= 1){
+    accessMsg = {text:'You must keep at least one Director/Admin login.', ok:false};
+    showView('d-access');
+    return;
+  }
+  const admin = STRUCT.admins.find(a=>a.id===id);
+  const ok = confirm(`Remove admin access for ${admin.name}? They will no longer be able to sign in as Director/Admin.`);
+  if(!ok) return;
+  STRUCT.admins = STRUCT.admins.filter(a=>a.id!==id);
+  await saveAdmins();
+  accessMsg = {text:`Removed ${admin.name}.`, ok:true};
+  showView('d-access');
+}
+
+/* ===================== DIRECTOR: MANAGE STRUCTURE ===================== */
+let structClusterTab = 'functional';
+let structDeptMsg = {text:'', ok:true};
+let structCompMsg = {text:'', ok:true};
+
+function viewDirectorStructure(){
+  const deptRows = STRUCT.departments.map((d,i)=>`<tr>
+    <td><b>${d.name}</b><div class="small muted">slug: ${d.slug}</div></td>
+    <td><code>${d.shortCode}</code></td>
+    <td style="display:flex; gap:6px;">
+      <button class="btn btn-ghost" onclick="promptRenameDept(${i})">Rename</button>
+      <button class="btn btn-danger-ghost" onclick="promptDeleteDept(${i})">Delete</button>
+    </td>
+  </tr>`).join('');
+
+  const comps = compsByCluster(structClusterTab);
+  const meta = clusterMeta(structClusterTab);
+  const compRows = comps.map(c=>`<tr>
+    <td style="width:56px;"><span class="badge neutral">${c.code}</span></td>
+    <td>
+      <b>${c.name}</b>
+      <div class="small muted" style="margin-top:3px; max-width:520px;">${c.definition||''}</div>
+    </td>
+    <td style="display:flex; gap:6px;">
+      <button class="btn btn-ghost" onclick="openEditCompetency('${c.code}')">Edit</button>
+      <button class="btn btn-danger-ghost" onclick="promptDeleteCompetency('${c.code}')">Delete</button>
+    </td>
+  </tr>`).join('');
+
+  return `
+    <div class="topbar">
+      <h2>Manage Structure</h2>
+      <div class="desc">Add, rename, or remove departments and competencies. Changes apply immediately across Set Standards, Self-Ratings, Dashboard and Calendar — new items start with neutral defaults you can adjust in <b>Set Standards</b>.</div>
+    </div>
+
+    <div class="panel card">
+      <h3>Departments / HOD Roles</h3>
+      <div class="panel-desc">${STRUCT.departments.length} department(s). Deleting a department permanently removes its standards, self-ratings and login passcode.</div>
+      <table>
+        <thead><tr><th>Department</th><th>Short Code (login)</th><th>Actions</th></tr></thead>
+        <tbody>${deptRows}</tbody>
+      </table>
+      <div class="row gap12" style="margin-top:16px; flex-wrap:wrap;">
+        <input type="text" id="newDeptName" placeholder="New department name (e.g. Legal & Compliance)" style="min-width:280px;">
+        <button class="btn btn-primary" onclick="addDepartment()">+ Add Department</button>
+      </div>
+      <div id="deptMsg" class="small" style="color:${structDeptMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:6px;">${structDeptMsg.text}</div>
+    </div>
+
+    <div class="panel card">
+      <h3>Competencies</h3>
+      <div class="panel-desc">${COMP.length} competenc${COMP.length===1?'y':'ies'} across 4 clusters. Deleting a competency permanently removes it from every department's standards and self-ratings.</div>
+      ${tabsHtml(CLUSTERS, structClusterTab, 'onStructClusterChange')}
+      <table>
+        <thead><tr><th>Code</th><th>Competency</th><th>Actions</th></tr></thead>
+        <tbody>${compRows}</tbody>
+      </table>
+      <div class="card" style="padding:16px; margin-top:16px; background:var(--paper-2); border-style:dashed;">
+        <div class="small muted" style="margin-bottom:8px; font-weight:700;">+ Add Competency to ${meta.label}</div>
+        <div class="row gap12" style="flex-wrap:wrap; margin-bottom:8px;">
+          <input type="text" id="newCompName" placeholder="Competency name" style="min-width:240px;">
+        </div>
+        <div class="row gap12" style="flex-wrap:wrap; margin-bottom:8px;">
+          <input type="text" id="newCompDef" placeholder="Definition (optional)" style="min-width:340px; flex:1;">
+        </div>
+        <div class="row gap12" style="flex-wrap:wrap; margin-bottom:8px;">
+          <input type="text" id="newCompInd" placeholder="What good looks like (optional)" style="min-width:340px; flex:1;">
+        </div>
+        <button class="btn btn-primary" onclick="addCompetency()">+ Add Competency</button>
+      </div>
+      <div id="compMsg" class="small" style="color:${structCompMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:6px;">${structCompMsg.text}</div>
+    </div>
+  `;
+}
+function onStructClusterChange(k){ structClusterTab = k; showView('d-structure'); }
+
+async function addDepartment(){
+  const nameInput = document.getElementById('newDeptName');
+  const name = nameInput.value.trim();
+  if(!name){ structDeptMsg = {text:'Enter a department name.', ok:false}; showView('d-structure'); return; }
+  const existingSlugs = STRUCT.departments.map(d=>d.slug);
+  const existingCodes = STRUCT.departments.map(d=>d.shortCode);
+  const slug = ensureUniqueSlug(slugify(name), existingSlugs);
+  const shortCode = generateShortCode(name, existingCodes);
+  STRUCT.departments.push({slug, name, shortCode});
+  await saveStructure();
+  structDeptMsg = {text:`Added "${name}". Default login passcode: ${shortCode}@123 (share with the new HOD). Set their required standards in Set Standards.`, ok:true};
+  showView('d-structure');
+}
+async function promptRenameDept(deptIdx){
+  const current = STRUCT.departments[deptIdx];
+  const newName = prompt('Rename department:', current.name);
+  if(newName === null) return;
+  const trimmed = newName.trim();
+  if(!trimmed) return;
+  current.name = trimmed;
+  await saveStructure();
+  showView('d-structure');
+}
+async function promptDeleteDept(deptIdx){
+  const d = STRUCT.departments[deptIdx];
+  const ok = confirm(`Delete "${d.name}"? This permanently removes their required standards, self-ratings and login passcode. This cannot be undone.`);
+  if(!ok) return;
+  await kset('standards_' + d.slug, {}).catch(()=>{});
+  await kset('selfrate_' + d.slug, {}).catch(()=>{});
+  await kset('auth_dept_pass_' + d.slug, randomPass()).catch(()=>{}); // invalidate old passcode
+  STRUCT.departments.splice(deptIdx, 1);
+  await saveStructure();
+  showView('d-structure');
+}
+
+async function addCompetency(){
+  const name = document.getElementById('newCompName').value.trim();
+  const def = document.getElementById('newCompDef').value.trim();
+  const ind = document.getElementById('newCompInd').value.trim();
+  if(!name){ structCompMsg = {text:'Enter a competency name.', ok:false}; showView('d-structure'); return; }
+  const code = nextCompetencyCode(structClusterTab);
+  const meta = clusterMeta(structClusterTab);
+  STRUCT.competencies.push({
+    code, name, cluster: structClusterTab, clusterLabel: meta.label,
+    definition: def, indicators: ind, req: {}
+  });
+  await saveStructure();
+  structCompMsg = {text:`Added "${name}" (${code}) to ${meta.label}. Default required standard is 3 for all departments until you adjust it in Set Standards.`, ok:true};
+  showView('d-structure');
+}
+function openEditCompetency(code){
+  const c = STRUCT.competencies.find(x=>x.code===code);
+  if(!c) return;
+  const newName = prompt('Competency name:', c.name);
+  if(newName === null) return;
+  const newDef = prompt('Definition:', c.definition||'');
+  if(newDef === null) return;
+  const newInd = prompt('What good looks like (behavioural indicators):', c.indicators||'');
+  if(newInd === null) return;
+  c.name = newName.trim() || c.name;
+  c.definition = newDef.trim();
+  c.indicators = newInd.trim();
+  saveStructure().then(()=>showView('d-structure'));
+}
+async function promptDeleteCompetency(code){
+  const c = STRUCT.competencies.find(x=>x.code===code);
+  if(!c) return;
+  const ok = confirm(`Delete "${c.name}" (${code})? This removes it from every department's standards and self-ratings. This cannot be undone.`);
+  if(!ok) return;
+  STRUCT.competencies = STRUCT.competencies.filter(x=>x.code!==code);
+  await saveStructure();
+  showView('d-structure');
+}
+
+/* ===================== DIRECTOR: TRAINER DIRECTORY ===================== */
+let trainerMsg = {text:'', ok:true};
+
+function viewTrainerDirectory(){
+  const rows = STRUCT.trainers.map(t=>`<tr>
+    <td><b>${t.name}</b></td>
+    <td>${t.specialization||'<span class="muted">—</span>'}</td>
+    <td>${t.contact||'<span class="muted">—</span>'}</td>
+    <td>${t.rate?('₹'+Number(t.rate).toLocaleString('en-IN')):'<span class="muted">—</span>'}</td>
+    <td style="display:flex; gap:6px;">
+      <button class="btn btn-ghost" onclick="openEditTrainer('${t.id}')">Edit</button>
+      <button class="btn btn-danger-ghost" onclick="promptDeleteTrainer('${t.id}')">Delete</button>
+    </td>
+  </tr>`).join('') || `<tr><td colspan="5" class="muted" style="text-align:center;padding:24px;">No trainers added yet — add your first one below.</td></tr>`;
+
+  return `
+    <div class="topbar">
+      <h2>Trainer Directory</h2>
+      <div class="desc">Maintain your list of trainers/facilitators (internal or external) — you'll assign them to specific workshops in the Training Calendar.</div>
+    </div>
+    <div class="panel card">
+      <h3>Trainers</h3>
+      <table>
+        <thead><tr><th>Name</th><th>Specialisation</th><th>Contact</th><th>Typical Rate</th><th>Actions</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="row gap12" style="margin-top:16px; flex-wrap:wrap;">
+        <input type="text" id="newTrainerName" placeholder="Trainer name" style="min-width:180px;">
+        <input type="text" id="newTrainerSpec" placeholder="Specialisation (e.g. Leadership, RERA/Compliance)" style="min-width:220px;">
+        <input type="text" id="newTrainerContact" placeholder="Phone or email" style="min-width:180px;">
+        <input type="number" id="newTrainerRate" placeholder="Typical rate (₹)" style="width:150px;">
+        <button class="btn btn-primary" onclick="addTrainer()">+ Add Trainer</button>
+      </div>
+      <div id="trainerMsg" class="small" style="color:${trainerMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:6px;">${trainerMsg.text}</div>
+    </div>
+  `;
+}
+async function addTrainer(){
+  const name = document.getElementById('newTrainerName').value.trim();
+  const spec = document.getElementById('newTrainerSpec').value.trim();
+  const contact = document.getElementById('newTrainerContact').value.trim();
+  const rate = document.getElementById('newTrainerRate').value.trim();
+  if(!name){ trainerMsg = {text:'Enter a trainer name.', ok:false}; showView('d-trainers'); return; }
+  const id = slugify(name) + '-' + Date.now().toString(36);
+  STRUCT.trainers.push({id, name, specialization:spec, contact, rate: rate?Number(rate):null});
+  await saveTrainers();
+  trainerMsg = {text:`Added "${name}" to the trainer directory.`, ok:true};
+  showView('d-trainers');
+}
+function openEditTrainer(id){
+  const t = STRUCT.trainers.find(x=>x.id===id);
+  if(!t) return;
+  const name = prompt('Trainer name:', t.name);
+  if(name === null) return;
+  const spec = prompt('Specialisation:', t.specialization||'');
+  if(spec === null) return;
+  const contact = prompt('Contact (phone/email):', t.contact||'');
+  if(contact === null) return;
+  const rate = prompt('Typical rate (₹, numbers only):', t.rate||'');
+  if(rate === null) return;
+  t.name = name.trim() || t.name;
+  t.specialization = spec.trim();
+  t.contact = contact.trim();
+  t.rate = rate.trim() ? Number(rate.trim()) : null;
+  saveTrainers().then(()=>showView('d-trainers'));
+}
+async function promptDeleteTrainer(id){
+  const t = STRUCT.trainers.find(x=>x.id===id);
+  if(!t) return;
+  const ok = confirm(`Remove ${t.name} from the trainer directory? Any training plans already assigned to them will keep showing their name, but you won't be able to pick them for new plans.`);
+  if(!ok) return;
+  STRUCT.trainers = STRUCT.trainers.filter(x=>x.id!==id);
+  await saveTrainers();
+  showView('d-trainers');
+}
+
+/* ===================== DIRECTOR: BACKUP & RESTORE ===================== */
+let backupMsg = {text:'', ok:true};
+
+async function gatherFullBackup(){
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    tool: 'Mangalam Competency Portal',
+    departments: STRUCT.departments,
+    competencies: STRUCT.competencies,
+    admins: STRUCT.admins,
+    trainers: STRUCT.trainers,
+    trainingPlans: await loadTrainingPlans(),
+    standards: {},
+    selfrate: {},
+    deptPasscodes: {},
+    stdComments: {},
+    reviewComments: {},
+    assessorRatings: {}
+  };
+  for(const d of STRUCT.departments){
+    backup.standards[d.slug] = await kget('standards_' + d.slug);
+    backup.selfrate[d.slug] = await kget('selfrate_' + d.slug);
+    backup.deptPasscodes[d.slug] = await kget('auth_dept_pass_' + d.slug);
+    backup.stdComments[d.slug] = await kget('std_comment_' + d.slug);
+    backup.reviewComments[d.slug] = await kget('review_comment_' + d.slug);
+    backup.assessorRatings[d.slug] = await kget('assessor_' + d.slug);
+  }
+  return backup;
+}
+async function exportFullBackup(){
+  const backup = await gatherFullBackup();
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `Mangalam_Competency_Backup_${dateStr}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  backupMsg = {text:'✓ Backup downloaded. Keep this file safe — use "Restore from Backup" below to load it into any copy of this tool.', ok:true};
+  showView('d-backup');
+}
+async function handleImportFile(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const ok = confirm('Restore from this backup file? This will overwrite all current departments, competencies, admins, standards and self-ratings with what is in the file. This cannot be undone.');
+  if(!ok){ event.target.value = ''; return; }
+  try{
+    const text = await file.text();
+    const backup = JSON.parse(text);
+    if(!backup.departments || !backup.competencies || !backup.admins){
+      backupMsg = {text:'This does not look like a valid backup file for this tool.', ok:false};
+      showView('d-backup');
+      return;
+    }
+    await kset('structure_departments', backup.departments);
+    await kset('structure_competencies', backup.competencies);
+    await kset('structure_admins', backup.admins);
+    for(const slug of Object.keys(backup.standards || {})){
+      if(backup.standards[slug] != null) await kset('standards_' + slug, backup.standards[slug]);
+    }
+    for(const slug of Object.keys(backup.selfrate || {})){
+      if(backup.selfrate[slug] != null) await kset('selfrate_' + slug, backup.selfrate[slug]);
+    }
+    for(const slug of Object.keys(backup.deptPasscodes || {})){
+      if(backup.deptPasscodes[slug] != null) await kset('auth_dept_pass_' + slug, backup.deptPasscodes[slug]);
+    }
+    for(const slug of Object.keys(backup.stdComments || {})){
+      if(backup.stdComments[slug] != null) await kset('std_comment_' + slug, backup.stdComments[slug]);
+    }
+    for(const slug of Object.keys(backup.reviewComments || {})){
+      if(backup.reviewComments[slug] != null) await kset('review_comment_' + slug, backup.reviewComments[slug]);
+    }
+    for(const slug of Object.keys(backup.assessorRatings || {})){
+      if(backup.assessorRatings[slug] != null) await kset('assessor_' + slug, backup.assessorRatings[slug]);
+    }
+    if(backup.trainers) await kset('structure_trainers', backup.trainers);
+    if(backup.trainingPlans) await kset('training_plans', backup.trainingPlans);
+    // Apply directly to the in-memory structure rather than re-reading from
+    // storage — some storage backends don't guarantee an immediate read
+    // reflects a just-completed write, and we already have the full data.
+    STRUCT.departments = backup.departments;
+    STRUCT.competencies = backup.competencies;
+    STRUCT.admins = backup.admins;
+    STRUCT.trainers = backup.trainers || [];
+    TRAINING_PLANS_CACHE = backup.trainingPlans || [];
+    DEPTS = STRUCT.departments.map(d => d.name);
+    COMP = STRUCT.competencies;
+    populateHodDeptSelect();
+    populateAdminSelect();
+    STANDARDS_CACHE = {}; SELFRATE_CACHE = {}; STD_COMMENT_CACHE = {}; ASSESSOR_PENDING = {}; ASSESSOR_CACHE = {};
+    backupMsg = {text:`✓ Restored successfully — ${backup.departments.length} departments, ${backup.competencies.length} competencies, ${backup.admins.length} admin(s). Backup was taken ${backup.exportedAt ? new Date(backup.exportedAt).toLocaleString('en-IN') : 'at an unknown time'}.`, ok:true};
+  }catch(e){
+    backupMsg = {text:'Could not read that file — make sure it is an unmodified backup exported from this tool.', ok:false};
+  }
+  event.target.value = '';
+  showView('d-backup');
+}
+async function viewDirectorBackup(){
+  return `
+    <div class="topbar">
+      <h2>Backup &amp; Restore</h2>
+      <div class="desc">Your data now lives permanently in your own database — it survives updates to this file automatically. This backup is still a good safety net (e.g. before major changes), but it's no longer strictly required after every update the way it used to be.</div>
+    </div>
+    <div class="callout">
+      <span class="callout-ic">⚠️</span>
+      <div><b>Do this before every update.</b> Export now, save the file somewhere safe (email it to yourself, save to a folder) — then Restore it the moment you open any new version of this tool.</div>
+    </div>
+    <div class="panel card">
+      <h3>Export Backup</h3>
+      <div class="panel-desc">Downloads everything — all departments, competencies, admin logins, HOD passcodes, standards, and self-ratings — as one file.</div>
+      <button class="btn btn-primary" onclick="exportFullBackup()">⬇ Export Full Backup</button>
+    </div>
+    <div class="panel card">
+      <h3>Restore from Backup</h3>
+      <div class="panel-desc">Choose a previously exported backup file to restore everything exactly as it was. This overwrites whatever is currently loaded.</div>
+      <input type="file" accept="application/json" id="importFileInput" onchange="handleImportFile(event)">
+    </div>
+    <div id="backupMsg" class="small" style="color:${backupMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px;">${backupMsg.text}</div>
+
+    <div class="panel card" style="border-color:#EFD3CE;">
+      <h3 style="color:var(--danger);">Reset for Go-Live</h3>
+      <div class="panel-desc">Use this once, right before sharing the link with your real HODs — clears out all your test data so everyone starts on a genuinely clean slate.</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div class="card" style="padding:14px; background:var(--good-bg); border-color:transparent;">
+          <b class="small" style="color:var(--good);">✓ KEPT AS-IS</b>
+          <ul style="margin:8px 0 0; padding-left:18px; font-size:12.5px; line-height:1.8;">
+            <li>Departments &amp; competencies</li>
+            <li>Required standards you set</li>
+            <li>Director/Admin logins (Director, Subhash, Ram)</li>
+            <li>HOD passcodes</li>
+            <li>Trainer directory</li>
+          </ul>
+        </div>
+        <div class="card" style="padding:14px; background:var(--danger-bg); border-color:transparent;">
+          <b class="small" style="color:var(--danger);">✗ CLEARED</b>
+          <ul style="margin:8px 0 0; padding-left:18px; font-size:12.5px; line-height:1.8;">
+            <li>All HOD self-ratings (back to "Not started")</li>
+            <li>All your (Director's) ratings</li>
+            <li>Review notes &amp; standards notes</li>
+            <li>The saved Training Plan (budgets/trainers/topics)</li>
+          </ul>
+        </div>
+      </div>
+      <button class="btn btn-danger-ghost" onclick="resetForGoLive()">Reset All Ratings — Start Fresh</button>
+      <div id="resetMsg" class="small" style="color:${resetMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:8px;">${resetMsg.text}</div>
+    </div>
+    <footer class="foot-note">Tip: export a backup at the end of every week during the assessment window too, as a general safety net — not just before updates.</footer>
+  `;
+}
+let resetMsg = {text:'', ok:true};
+async function resetForGoLive(){
+  const ok = confirm('This clears every self-rating, every Director rating, all review notes, and the saved Training Plan — for ALL departments. Your standards, admin logins, HOD passcodes and trainer directory stay untouched.\n\nThis cannot be undone. Continue?');
+  if(!ok) return;
+  const ok2 = confirm('Really sure? This is the "start fresh before go-live" reset — only do this once you\'re done testing.');
+  if(!ok2) return;
+
+  for(const d of STRUCT.departments){
+    await kset('selfrate_' + d.slug, {status:'not_started', scores:{}, savedAt:null, submittedAt:null, hodName:''});
+    await kset('assessor_' + d.slug, {scores:{}, assessedBy:null, assessedAt:null});
+    await kset('std_comment_' + d.slug, '');
+    await kset('review_comment_' + d.slug, '');
+  }
+  await kset('training_plans', []);
+
+  SELFRATE_CACHE = {};
+  ASSESSOR_CACHE = {};
+  STD_COMMENT_CACHE = {};
+  ASSESSOR_PENDING = {};
+  TRAINING_PLANS_CACHE = [];
+
+  resetMsg = {text:`✓ Reset complete — all ${STRUCT.departments.length} departments are back to "Not started". Structure, standards, logins and trainers were kept.`, ok:true};
+  showView('d-backup');
+}
+
+/* ===================== HOD: SELF-ASSESSMENT ===================== */
+async function viewHodRate(){
+  const deptIdx = CURRENT.deptIndex;
+  await loadSelfRateFor(deptIdx);
+  const sr = SELFRATE_CACHE[deptIdx];
+  const comps = compsByCluster(hodCluster);
+  const meta = clusterMeta(hodCluster);
+  const locked = sr.status === 'submitted';
+
+  const items = comps.map(c=>{
+    const val = sr.scores ? sr.scores[c.code] : undefined;
+    const buttons = [1,2,3,4,5].map(n=>`<button class="${val===n?'sel':''}" data-val="${n}" ${locked?'disabled':''} onclick="setSelfScore('${c.code}', ${n}, this)">${n}</button>`).join('');
+    return `<div class="rate-item">
+      <div class="rname">${c.name}</div>
+      <div class="rdef">${c.definition}</div>
+      ${c.indicators?`<div class="rind">What good looks like: ${c.indicators}</div>`:''}
+      <div class="scale">${buttons}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="topbar">
+      <h2>My Self-Assessment</h2>
+      <div class="desc">Rate yourself honestly on each competency (1 = critically below, 5 = exceptional). This helps identify where training will help you most — it is not compared to peers.</div>
+    </div>
+    <div class="callout">
+      <span class="callout-ic">📖</span>
+      <div><b>Please read the Process Guide first</b> before you start rating yourself — it explains how this is used and why honest answers matter.</div>
+      <button onclick="showView('guide')">Open Guide</button>
+    </div>
+    <div class="toolbar">
+      <div style="margin-left:auto;">${submissionStatusPill(sr.status)}</div>
+    </div>
+    ${tabsHtml(CLUSTERS, hodCluster, 'onHodClusterChange')}
+    <div class="panel card">
+      <h3 style="color:${meta.color}">${meta.label}</h3>
+      <div class="panel-desc">1 = Critically below expectation · 2 = Below expectation · 3 = Meets expectation (basic) · 4 = Exceeds expectation · 5 = Exceptional / role model</div>
+      ${items}
+    </div>
+    <div class="row gap12">
+      <button class="btn btn-ghost" ${locked?'disabled':''} onclick="saveHodDraft()">Save Draft</button>
+      <button class="btn btn-primary" ${locked?'disabled':''} onclick="submitHodFinal()">Submit Final Assessment</button>
+      ${locked?'<button class="btn btn-danger-ghost" onclick="reopenHodDraft()">Reopen &amp; edit</button>':''}
+      <span id="hodSaveMsg" class="small" style="color:var(--good);"></span>
+    </div>
+    ${locked?'<div class="login-hint" style="margin-top:16px;">Your assessment has been submitted. Your Director/Admin can now review it against the role standard.</div>':''}
+    ${locked?`<div class="callout" style="margin-top:16px;">
+      <span class="callout-ic">📥</span>
+      <div><b>If your Director says they can't see this submission</b>, click this button and send them the downloaded file directly (email/WhatsApp) — they can load it straight into their screen without waiting on anything else.</div>
+      <button onclick="downloadMySubmission()">Download My Submission</button>
+    </div>`:''}
+  `;
+}
+function downloadMySubmission(){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  const payload = {
+    type: 'hod_submission',
+    exportedAt: new Date().toISOString(),
+    deptSlug: slugFor(deptIdx),
+    deptName: DEPTS[deptIdx],
+    selfrate: sr
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safe = DEPTS[deptIdx].replace(/[^a-zA-Z0-9]+/g,'_');
+  a.href = url; a.download = `Submission_${safe}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function onHodClusterChange(k){ hodCluster = k; showView('h-rate'); }
+async function handleImportSubmission(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(payload.type !== 'hod_submission' || !payload.deptSlug || !payload.selfrate){
+      const msg = document.getElementById('importSubmissionMsg');
+      if(msg){ msg.style.color = 'var(--danger)'; msg.textContent = 'This does not look like a valid submission file.'; }
+      event.target.value = '';
+      return;
+    }
+    const deptIdx = findDeptIndexBySlug(payload.deptSlug);
+    if(deptIdx == null){
+      const msg = document.getElementById('importSubmissionMsg');
+      if(msg){ msg.style.color = 'var(--danger)'; msg.textContent = `No department matching "${payload.deptName}" found — it may have been renamed or removed.`; }
+      event.target.value = '';
+      return;
+    }
+    // Apply directly to the in-memory cache so it's visible immediately,
+    // regardless of whether shared storage is working in this session.
+    SELFRATE_CACHE[deptIdx] = payload.selfrate;
+    await kset('selfrate_' + payload.deptSlug, payload.selfrate); // best-effort persistence
+    dirRatingsDept = deptIdx;
+    ratingsImportMsg = `✓ Loaded ${payload.deptName}'s submission (exported ${payload.exportedAt ? new Date(payload.exportedAt).toLocaleString('en-IN') : 'unknown time'}).`;
+    showView('d-ratings');
+  }catch(e){
+    const msg = document.getElementById('importSubmissionMsg');
+    if(msg){ msg.style.color = 'var(--danger)'; msg.textContent = 'Could not read that file.'; }
+  }
+  event.target.value = '';
+}
+let ratingsImportMsg = '';
+function setSelfScore(code, n, btnEl){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  if(sr.status === 'submitted') return;
+  if(!sr.scores) sr.scores = {};
+  sr.scores[code] = n;
+  if(btnEl && btnEl.parentElement){
+    btnEl.parentElement.querySelectorAll('button').forEach(b=>{
+      b.classList.toggle('sel', parseInt(b.dataset.val,10) === n);
+    });
+  }
+  const msg = document.getElementById('hodSaveMsg');
+  if(msg) msg.textContent = '';
+}
+async function saveHodDraft(){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  sr.status = (sr.status === 'submitted') ? 'submitted' : 'draft';
+  sr.savedAt = Date.now();
+  await saveSelfRate(deptIdx, sr);
+  const msg = document.getElementById('hodSaveMsg');
+  if(msg) msg.textContent = '✓ Draft saved.';
+}
+async function submitHodFinal(){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  const total = COMP.length;
+  const rated = sr.scores ? Object.keys(sr.scores).length : 0;
+  if(rated < total){
+    const msg = document.getElementById('hodSaveMsg');
+    if(msg) msg.textContent = `Please rate all ${total} competencies before submitting (${rated}/${total} done).`;
+    return;
+  }
+  sr.status = 'submitted';
+  sr.submittedAt = Date.now();
+  await saveSelfRate(deptIdx, sr);
+  showView('h-rate');
+}
+async function reopenHodDraft(){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  sr.status = 'draft';
+  await saveSelfRate(deptIdx, sr);
+  showView('h-rate');
+}
+
+/* ===================== HOD: MY STATUS ===================== */
+async function viewHodStatus(){
+  const deptIdx = CURRENT.deptIndex;
+  const sr = SELFRATE_CACHE[deptIdx];
+  const clusterProgress = CLUSTERS.map(cl=>{
+    const comps = compsByCluster(cl.key);
+    const rated = comps.filter(c => sr.scores && sr.scores[c.code] != null).length;
+    return {cl, rated, total: comps.length};
+  });
+  const rows = clusterProgress.map(p=>{
+    const pct = Math.round(p.rated/p.total*100);
+    return `<div class="bar-row">
+      <div class="bar-label"><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.cl.color};margin-right:6px;"></span>${p.cl.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${p.cl.color};"></div></div>
+      <div class="bar-val">${p.rated}/${p.total}</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="topbar">
+      <h2>My Status</h2>
+      <div class="desc">Track your own self-assessment completion. Required standards and comparisons are visible only to your Director / Admin.</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="lbl">Status</div><div class="val" style="font-size:20px;">${submissionStatusPill(sr.status)}</div></div>
+      <div class="card kpi"><div class="lbl">Last Saved</div><div class="val" style="font-size:18px;">${sr.savedAt? new Date(sr.savedAt).toLocaleString('en-IN'):'—'}</div></div>
+      <div class="card kpi"><div class="lbl">Submitted On</div><div class="val" style="font-size:18px;">${sr.submittedAt? new Date(sr.submittedAt).toLocaleDateString('en-IN'):'—'}</div></div>
+    </div>
+    <div class="panel card">
+      <h3>Completion by Cluster</h3>
+      ${rows}
+    </div>
+  `;
+}
+
+/* ===================== PROCESS GUIDE (CHRO PLAYBOOK) ===================== */
+function viewProcessGuide(){
+  const isDirector = CURRENT.role === 'director';
+
+  const directorSteps = `
+    <div class="panel card">
+      <h3>The Recommended Assessment Cycle</h3>
+      <div class="panel-desc">A practical 6-step cycle for running this end-to-end — built for a first-time rollout, tunable in later years.</div>
+      <table>
+        <thead><tr><th style="width:90px;">When</th><th>Step</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td><b>Week 1</b></td><td>Calibrate standards</td><td>You finalise Required scores per role in <b>Set Standards</b>. Sanity-check with each functional head before locking — a standard nobody agrees with won't be trusted later.</td></tr>
+          <tr><td><b>Week 1</b></td><td>Communicate intent</td><td>Brief all HODs together (not one-on-one first) on <i>why</i>: this is a development tool, not a punitive one. State clearly that self-scores are never seen by peers, and low scores will not be held against them if paired with genuine effort to close the gap.</td></tr>
+          <tr><td><b>Week 2</b></td><td>Self-assessment window</td><td>HODs log in and rate themselves honestly. Keep this window short (5–7 working days) — long windows invite second-guessing and less honest first-instinct answers.</td></tr>
+          <tr><td><b>Week 3</b></td><td>Review the gaps</td><td>Use <b>Analytics Dashboard</b> and <b>Self-Ratings &amp; Gaps</b> to spot patterns — is one HOD weak everywhere, or is one competency weak across the whole company (that's a systemic gap, not an individual one)?</td></tr>
+          <tr><td><b>Week 3–4</b></td><td>1:1 calibration conversations</td><td>Before finalising anything, sit with each HOD individually. Share their own gap report, ask what's blocking them, and let them react. This step matters more than the scoring itself — it converts a spreadsheet into a development plan they'll actually own.</td></tr>
+          <tr><td><b>Week 4–5</b></td><td>Publish the training calendar</td><td>Finalise <b>Training Calendar</b>, present it to the MD alongside budget ask, and share each HOD's own quarter-wise plan with them directly.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel card">
+      <h3>CHRO Notes for a First-Time Rollout</h3>
+      <div class="panel-desc">A few things worth deciding upfront, from having run this kind of exercise before.</div>
+      <ul style="margin:0; padding-left:20px; line-height:1.9; font-size:13.5px; color:var(--ink);">
+        <li><b>Don't tie Year 1 results to compensation or PIPs.</b> If people believe honest self-rating will hurt their appraisal, they'll rate defensively and the data becomes useless. Position Year 1 purely as a development baseline — trust earned here pays off in Year 2 and 3 data quality.</li>
+        <li><b>Treat a gap of 2+ as a conversation trigger, not a verdict.</b> A large gap on one competency for an otherwise strong HOD is often a role-design or delegation issue, not a competence issue — the 1:1 is where you find out which.</li>
+        <li><b>Watch for company-wide gaps, not just individual ones.</b> If 6 of 10 HODs show a gap on the same competency (e.g. "Change Management" or "Reporting &amp; Documentation"), that's a single company-wide workshop, not ten individual ones — much better use of your L&amp;D budget.</li>
+        <li><b>Re-calibrate standards annually, not the competency list.</b> The 33 competencies and 4 clusters should stay stable for 2–3 years for trend comparison; only the required score per role should move as the business matures.</li>
+        <li><b>Close the loop visibly.</b> Nothing kills participation in Year 2 faster than HODs sensing Year 1 data went nowhere. Even a short note — "here's what we did with what you told us" — sustains honesty next cycle.</li>
+      </ul>
+    </div>
+  `;
+
+  const hodSteps = `
+    <div class="panel card">
+      <h3>How This Assessment Works</h3>
+      <div class="panel-desc">A short guide to what happens with your self-assessment.</div>
+      <ul style="margin:0; padding-left:20px; line-height:1.9; font-size:13.5px; color:var(--ink);">
+        <li>Rate yourself honestly on each competency, on a 1–5 scale. There's no "pass" or "fail" score — this is a development tool, not an exam.</li>
+        <li>Your ratings are private. Other HODs never see your scores, and you never see anyone else's.</li>
+        <li>Once you submit, your Director/Admin will review your ratings against the role's expected standard and set up a short 1:1 conversation with you before anything is finalised.</li>
+        <li>The outcome is a personal, quarter-wise development plan — workshops, mentoring, or focused practice — built around where it will help you most.</li>
+        <li>Take your time and answer your first instinct — overthinking each score tends to make it less accurate, not more.</li>
+      </ul>
+    </div>
+  `;
+
+  return `
+    <div class="topbar">
+      <h2>Process Guide</h2>
+      <div class="desc">${isDirector ? "A CHRO's playbook for running this competency cycle end-to-end." : "What to expect from this assessment, and what happens after you submit."}</div>
+    </div>
+    ${isDirector ? directorSteps : hodSteps}
+  `;
+}
+
+/* ===================== HOOKS / INIT ===================== */
+function afterRenderHooks(viewId){ /* reserved for future JS wiring after innerHTML swap */ }
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await initStructure();
+  populateHodDeptSelect();
+  populateAdminSelect();
+  setLoginRole('director');
+});
+
+</script>
+</body>
+</html>
