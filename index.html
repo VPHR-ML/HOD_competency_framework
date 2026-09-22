@@ -258,6 +258,7 @@
     .bar-label{ width:130px; }
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -323,10 +324,10 @@
       <div class="navitem" data-view="d-ratings" onclick="showView('d-ratings')">Self-Ratings &amp; Gaps</div>
       <div class="navitem" data-view="d-dashboard" onclick="showView('d-dashboard')">Analytics Dashboard</div>
       <div class="navitem" data-view="d-calendar" onclick="showView('d-calendar')">Training Calendar</div>
-      <div class="navitem" data-view="d-access" onclick="showView('d-access')">Manage Access</div>
-      <div class="navitem" data-view="d-structure" onclick="structDeptMsg={text:'',ok:true}; structCompMsg={text:'',ok:true}; showView('d-structure')">Manage Structure</div>
+      <div class="navitem full-admin-only" data-view="d-access" onclick="showView('d-access')">Manage Access</div>
+      <div class="navitem full-admin-only" data-view="d-structure" onclick="structDeptMsg={text:'',ok:true}; structCompMsg={text:'',ok:true}; showView('d-structure')">Manage Structure</div>
       <div class="navitem" data-view="d-trainers" onclick="trainerMsg={text:'',ok:true}; showView('d-trainers')">Trainer Directory</div>
-      <div class="navitem" data-view="d-backup" onclick="backupMsg={text:'',ok:true}; showView('d-backup')">Backup &amp; Restore</div>
+      <div class="navitem full-admin-only" data-view="d-backup" onclick="backupMsg={text:'',ok:true}; showView('d-backup')">Backup &amp; Restore</div>
       <div class="navitem" data-view="guide" onclick="showView('guide')">Process Guide</div>
     </div>
     <div id="navItemsHod" class="hidden">
@@ -548,6 +549,25 @@ async function initStructure(){
     if(rp && rp.passcode === 'Ram@123'){ rp.passcode = 'rp@123'; changed = true; }
     if(changed) await kset('structure_admins', admins);
   }
+  // One-time migration: split "Purchase, Legal & Liaison" into two separate
+  // departments — "Purchase" keeps all existing data (standards, ratings,
+  // passcode); "Legal & Liaisoning" starts completely blank for the
+  // Director to rate fresh.
+  const oldIdx = depts.findIndex(d => d.slug === 'purchase-legal-liaison');
+  if(oldIdx >= 0){
+    const oldDept = depts[oldIdx];
+    const purchaseDept = {slug:'purchase', name:'Purchase', shortCode:'PUR'};
+    const legalDept = {slug:'legal-liaisoning', name:'Legal & Liaisoning', shortCode:'LEG'};
+    depts.splice(oldIdx, 1, purchaseDept, legalDept);
+    // Copy every piece of existing data from the old combined slug onto
+    // the new "purchase" slug — nothing is lost.
+    const keysToCopy = ['standards_', 'selfrate_', 'assessor_', 'std_comment_', 'review_comment_', 'auth_dept_pass_'];
+    for(const prefix of keysToCopy){
+      const val = await kget(prefix + oldDept.slug);
+      if(val != null) await kset(prefix + purchaseDept.slug, val);
+    }
+    await kset('structure_departments', depts);
+  }
   let trainers = await kget('structure_trainers');
   if(!trainers){ trainers = []; await kset('structure_trainers', trainers); }
   STRUCT.departments = depts;
@@ -585,6 +605,23 @@ function findDeptIndexBySlug(slug){
   if(!slug) return null;
   const idx = STRUCT.departments.findIndex(d => d.slug === slug);
   return idx >= 0 ? idx : null;
+}
+/* A "full" admin (no scopeDepts, or an empty scope array) sees and edits
+   everything. A "scoped" admin is restricted to specific departments —
+   used to let e.g. one Director manage only Purchase, another only
+   Legal & Liaisoning, without either seeing the other's data-entry
+   screens. Their saved data still rolls up into the shared company-wide
+   Dashboard that full admins see, since it's the same underlying storage. */
+function isFullAdmin(){
+  return CURRENT && CURRENT.role === 'director' && (!CURRENT.scopeDepts || CURRENT.scopeDepts.length === 0);
+}
+function visibleDeptIndices(){
+  if(isFullAdmin() || !CURRENT || CURRENT.role !== 'director'){
+    return DEPTS.map((d,i)=>i);
+  }
+  return (CURRENT.scopeDepts || [])
+    .map(slug => findDeptIndexBySlug(slug))
+    .filter(i => i != null);
 }
 
 /* ===================== APP STATE ===================== */
@@ -637,9 +674,12 @@ async function attemptLogin(){
       errBox.textContent = 'Incorrect password for that name. Please try again.';
       return;
     }
-    CURRENT = {role:'director', name: admin.name, adminId: admin.id, deptIndex: findDeptIndexBySlug(admin.deptSlug)};
+    CURRENT = {role:'director', name: admin.name, adminId: admin.id, deptIndex: findDeptIndexBySlug(admin.deptSlug), scopeDepts: admin.scopeDepts || null};
     dirStandardsCluster = 'functional'; dirRatingsCluster = 'functional'; structClusterTab = 'functional';
-    dirStandardsDept = 0; dirRatingsDept = 0; dashFilterDept = 'all'; dashFilterCluster = 'all'; calFilterDept = 'all';
+    const myDepts = visibleDeptIndices();
+    dirStandardsDept = myDepts[0] != null ? myDepts[0] : 0;
+    dirRatingsDept = myDepts[0] != null ? myDepts[0] : 0;
+    dashFilterDept = 'all'; dashFilterCluster = 'all'; calFilterDept = 'all';
   } else {
     const deptIdx = parseInt(document.getElementById('hodDept').value, 10);
     const pass = document.getElementById('hodPass').value.trim();
@@ -657,6 +697,9 @@ async function attemptLogin(){
   const showHodNav = (role === 'hod') || (role === 'director' && CURRENT.deptIndex != null);
   document.getElementById('navItemsDirector').classList.toggle('hidden', role!=='director');
   document.getElementById('navItemsHod').classList.toggle('hidden', !showHodNav);
+  document.querySelectorAll('.full-admin-only').forEach(el=>{
+    el.classList.toggle('hidden', role==='director' && !isFullAdmin());
+  });
   renderWho();
   if(role === 'director'){
     await preloadAllStandards();
@@ -719,10 +762,10 @@ async function loadAssessorFor(deptIdx){
   return obj;
 }
 async function preloadAllStandards(){
-  await Promise.all(DEPTS.map((d,i) => loadStandardsFor(i)));
+  await Promise.all(visibleDeptIndices().map((i) => loadStandardsFor(i)));
 }
 async function preloadAllSelfRates(){
-  await Promise.all(DEPTS.map((d,i) => Promise.all([loadSelfRateFor(i), loadAssessorFor(i)])));
+  await Promise.all(visibleDeptIndices().map((i) => Promise.all([loadSelfRateFor(i), loadAssessorFor(i)])));
 }
 /* Force-fresh reloads: bypass in-memory cache so the Director always sees the
    latest data saved by HODs in other tabs/devices/sessions. Used by every
@@ -804,6 +847,10 @@ function showView(viewId){
 }
 
 async function renderView(viewId){
+  const fullAdminOnly = ['d-access','d-structure','d-backup'];
+  if(fullAdminOnly.includes(viewId) && CURRENT && CURRENT.role==='director' && !isFullAdmin()){
+    return `<div class="card empty-state"><div class="big">🔒</div>This section is only available to full Directors/Admins — your login is scoped to specific department(s). Contact your Director if you need access.</div>`;
+  }
   switch(viewId){
     case 'd-overview': return await viewDirectorOverview();
     case 'd-standards': return await viewDirectorStandards();
@@ -849,8 +896,9 @@ function tabsHtml(items, activeKey, onClickFnName, extraArg){
   }).join('')}</div>`;
 }
 function deptSelectHtml(id, selectedIdx, onChangeFnName){
+  const myDepts = visibleDeptIndices();
   return `<select id="${id}" onchange="${onChangeFnName}(this.value)">
-    ${DEPTS.map((d,i)=>`<option value="${i}" ${i==selectedIdx?'selected':''}>${d}</option>`).join('')}
+    ${myDepts.map(i=>`<option value="${i}" ${i==selectedIdx?'selected':''}>${DEPTS[i]}</option>`).join('')}
   </select>`;
 }
 function submissionStatusPill(status){
@@ -865,11 +913,13 @@ function fmt1(n){ return (Math.round(n*10)/10).toFixed(1); }
    (across all departments) currently have a gap >= threshold, based
    strictly on Director ratings. This is what tells you "one workshop
    for 7 HODs" vs "one-on-one coaching for 1 HOD". */
-function companyWideCompetencyGaps(threshold){
+function companyWideCompetencyGaps(threshold, deptIndices){
   threshold = threshold || 1;
+  const indices = deptIndices || DEPTS.map((d,i)=>i);
   const byCode = {};
   COMP.forEach(c => { byCode[c.code] = {comp:c, entries:[]}; });
-  DEPTS.forEach((d,i)=>{
+  indices.forEach(i=>{
+    const d = DEPTS[i];
     gapRowsForDept(i).forEach(r=>{
       if(r.gap != null && r.gap >= threshold){
         byCode[r.code].entries.push({deptIdx:i, dept:d, gap:r.gap});
@@ -907,21 +957,23 @@ function gapRowsForDept(deptIdx){
 /* ===================== DIRECTOR: OVERVIEW ===================== */
 async function viewDirectorOverview(){
   await refreshAllDirectorData();
-  const submitted = DEPTS.map((d,i)=>SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status === 'submitted');
+  const myDepts = visibleDeptIndices();
+  const submitted = myDepts.map(i=>SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status === 'submitted');
   const submittedCount = submitted.filter(Boolean).length;
-  const awaitingReview = DEPTS.filter((d,i)=>{
+  const awaitingReview = myDepts.filter(i=>{
     const sr = SELFRATE_CACHE[i];
     const ar = ASSESSOR_CACHE[i];
     return sr && sr.status === 'submitted' && (!ar || !ar.scores || Object.keys(ar.scores).length === 0);
   }).length;
   let allGaps = [];
-  DEPTS.forEach((d,i)=>{
+  myDepts.forEach(i=>{
     gapRowsForDept(i).forEach(r=>{ if(r.gap != null) allGaps.push(r.gap); });
   });
   const avgGap = allGaps.length ? avg(allGaps) : 0;
   const redFlags = allGaps.filter(g => g >= 2).length;
 
-  const rows = DEPTS.map((d,i)=>{
+  const rows = myDepts.map(i=>{
+    const d = DEPTS[i];
     const sr = SELFRATE_CACHE[i] || {status:'not_started'};
     const rows2 = gapRowsForDept(i).filter(r=>r.gap!=null);
     const deptAvgGap = rows2.length ? fmt1(avg(rows2.map(r=>r.gap))) : '—';
@@ -940,13 +992,13 @@ async function viewDirectorOverview(){
     <div class="topbar row between">
       <div>
         <h2>Overview</h2>
-        <div class="desc">Organisation-wide snapshot across all 10 HOD roles and 33 competencies (Functional, Leadership, Strategic, Behavioural).</div>
+        <div class="desc">${isFullAdmin() ? `Organisation-wide snapshot across all ${DEPTS.length} HOD roles and 33 competencies (Functional, Leadership, Strategic, Behavioural).` : `Snapshot for your assigned department(s): ${myDepts.map(i=>DEPTS[i]).join(', ')}.`}</div>
       </div>
       <button class="btn btn-ghost" onclick="showView('d-overview')">↻ Refresh</button>
     </div>
     <div class="kpi-grid">
-      <div class="card kpi"><div class="lbl">Departments</div><div class="val">${DEPTS.length}</div><div class="sub">Roles with defined standards</div></div>
-      <div class="card kpi"><div class="lbl">Self-Assessments Submitted</div><div class="val">${submittedCount} / ${DEPTS.length}</div><div class="sub">${DEPTS.length-submittedCount} pending</div></div>
+      <div class="card kpi"><div class="lbl">Departments</div><div class="val">${myDepts.length}</div><div class="sub">Roles with defined standards</div></div>
+      <div class="card kpi"><div class="lbl">Self-Assessments Submitted</div><div class="val">${submittedCount} / ${myDepts.length}</div><div class="sub">${myDepts.length-submittedCount} pending</div></div>
       <div class="card kpi"><div class="lbl">Awaiting Your Rating</div><div class="val">${awaitingReview}</div><div class="sub">Submitted, not yet reviewed by you</div></div>
       <div class="card kpi"><div class="lbl">Average Gap (org-wide)</div><div class="val">${allGaps.length? fmt1(avgGap):'—'}</div><div class="sub">Required minus your rating (Director-rated competencies only)</div></div>
       <div class="card kpi"><div class="lbl">Critical Gaps (≥2)</div><div class="val">${redFlags}</div><div class="sub">Across all submitted competencies</div></div>
@@ -966,7 +1018,8 @@ async function viewDirectorOverview(){
 /* ===================== DIRECTOR: SET STANDARDS ===================== */
 let STD_COMMENT_CACHE = {};
 async function viewDirectorStandards(){
-  await Promise.all(DEPTS.map(async (d,i) => {
+  const myDepts = visibleDeptIndices();
+  await Promise.all(myDepts.map(async (i) => {
     await loadStandardsFor(i);
     if(STD_COMMENT_CACHE[i] === undefined){
       STD_COMMENT_CACHE[i] = (await kget('std_comment_' + slugFor(i))) || '';
@@ -975,10 +1028,10 @@ async function viewDirectorStandards(){
   const comps = compsByCluster(dirStandardsCluster);
   const meta = clusterMeta(dirStandardsCluster);
 
-  const headerCells = DEPTS.map((d,i)=>`<th style="min-width:130px; text-align:center;">${d}</th>`).join('');
+  const headerCells = myDepts.map(i=>`<th style="min-width:130px; text-align:center;">${DEPTS[i]}</th>`).join('');
 
   const rows = comps.map(c => {
-    const cells = DEPTS.map((d,i)=>{
+    const cells = myDepts.map(i=>{
       const std = STANDARDS_CACHE[i] || {};
       const pending = (PENDING_STD_EDITS[i] && PENDING_STD_EDITS[i][c.code] != null) ? PENDING_STD_EDITS[i][c.code] : null;
       const val = pending != null ? pending : std[c.code];
@@ -992,7 +1045,7 @@ async function viewDirectorStandards(){
     </tr>`;
   }).join('');
 
-  const footerCells = DEPTS.map((d,i)=>`<td style="text-align:center; padding-top:14px; vertical-align:top;">
+  const footerCells = myDepts.map(i=>`<td style="text-align:center; padding-top:14px; vertical-align:top;">
     <textarea id="stdComment_${i}" placeholder="Notes for this department (optional)" rows="2" style="width:100%; font-size:11px; padding:6px; border-radius:6px; border:1px solid #D6D2C4; resize:vertical; margin-bottom:6px;">${STD_COMMENT_CACHE[i] || ''}</textarea>
     <button class="btn btn-primary small" style="padding:7px 12px; font-size:12px; width:100%;" onclick="saveStandardsForDept(${i})">Save</button>
     <button class="btn btn-ghost small" style="padding:5px 10px; font-size:11px; width:100%; margin-top:5px;" onclick="resetStandardsToDefault(${i})">Reset</button>
@@ -1002,7 +1055,7 @@ async function viewDirectorStandards(){
   return `
     <div class="topbar">
       <h2>Set Standards</h2>
-      <div class="desc">Define the <b>minimum required proficiency (1–5)</b> for each competency, per department/HOD role. Edit any cell, add a note if useful, then hit <b>Save</b> under that department's column — each column saves independently.</div>
+      <div class="desc">Define the <b>minimum required proficiency (1–5)</b> for each competency, per department/HOD role. Edit any cell, add a note if useful, then hit <b>Save</b> under that department's column — each column saves independently.${!isFullAdmin()?' <b>You can only set standards for your assigned department(s).</b>':''}</div>
     </div>
     ${tabsHtml(CLUSTERS, dirStandardsCluster, 'onStdClusterChange')}
     <div class="panel card">
@@ -1198,14 +1251,17 @@ function onRatClusterChange(k){ dirRatingsCluster = k; assessorMsg = ''; ratings
 /* ===================== DIRECTOR: ANALYTICS DASHBOARD ===================== */
 async function viewDirectorDashboard(){
   await refreshAllDirectorData();
-  // Build full gap dataset across departments that have submitted
+  const myDepts = visibleDeptIndices();
+  // Build full gap dataset across visible departments that have submitted
   let allRows = [];
-  DEPTS.forEach((d,i)=>{
+  myDepts.forEach(i=>{
+    const d = DEPTS[i];
     if(SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status !== 'not_started'){
       gapRowsForDept(i).forEach(r=>{ if(r.gap!=null) allRows.push(Object.assign({deptIdx:i, dept:d}, r)); });
     }
   });
 
+  const deptSelected = dashFilterDept !== 'all';
   const fRows = allRows.filter(r =>
     (dashFilterDept === 'all' || parseInt(dashFilterDept,10) === r.deptIdx) &&
     (dashFilterCluster === 'all' || dashFilterCluster === r.cluster)
@@ -1215,9 +1271,11 @@ async function viewDirectorDashboard(){
   const kpiCritical = fRows.filter(r=>r.gap>=2).length;
   const kpiOnTrack = fRows.filter(r=>r.gap<=0).length;
   const kpiTotal = fRows.length;
+  const readinessPct = fRows.length ? Math.round(fRows.filter(r=>r.gap<=0).length / fRows.length * 100) : null;
 
   // Avg gap by department (bar chart)
-  const byDept = DEPTS.map((d,i)=>{
+  const byDept = myDepts.map(i=>{
+    const d = DEPTS[i];
     const rows = allRows.filter(r=>r.deptIdx===i && (dashFilterCluster==='all'||dashFilterCluster===r.cluster));
     return {dept:d, avgGap: rows.length? avg(rows.map(r=>r.gap)) : null};
   }).filter(x=>x.avgGap!=null);
@@ -1232,10 +1290,29 @@ async function viewDirectorDashboard(){
     </div>`;
   }).join('') || '<div class="muted small">No submitted data yet for this filter.</div>';
 
+  // Cluster-wise summary — which of the 4 competency clusters is weakest overall
+  const clusterSummary = CLUSTERS.map(cl=>{
+    const rows = allRows.filter(r=>r.cluster===cl.key && (dashFilterDept==='all'||parseInt(dashFilterDept,10)===r.deptIdx));
+    return {cl, avgGap: rows.length? avg(rows.map(r=>r.gap)) : null, count: rows.length, critical: rows.filter(r=>r.gap>=2).length};
+  });
+  const maxClusterGap = Math.max(1, ...clusterSummary.filter(x=>x.avgGap!=null).map(x=>Math.abs(x.avgGap)));
+  const clusterRows = clusterSummary.map(x=>{
+    if(x.avgGap==null) return `<tr><td><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${x.cl.color};margin-right:6px;"></span>${x.cl.label}</td><td colspan="3" class="muted" style="text-align:center;">No data yet</td></tr>`;
+    const pct = Math.min(100, Math.abs(x.avgGap)/maxClusterGap*100);
+    const color = x.avgGap>=2?'var(--danger)':(x.avgGap>=1?'var(--warn)':'var(--good)');
+    return `<tr>
+      <td><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${x.cl.color};margin-right:6px;"></span>${x.cl.label}</td>
+      <td style="width:200px;"><div class="bar-track" style="height:12px;"><div class="bar-fill" style="width:${pct}%; background:${color}; height:12px;"></div></div></td>
+      <td style="text-align:center; width:80px;">${fmt1(x.avgGap)}</td>
+      <td style="text-align:center; width:80px;">${x.critical}</td>
+    </tr>`;
+  }).join('');
+
   // Heatmap: department x cluster avg gap
   const heatHeader = `<div class="heat-cell" style="background:transparent;color:var(--ink-soft);font-weight:800;">Dept</div>` +
     CLUSTERS.map(c=>`<div class="heat-cell" style="background:transparent;color:var(--ink-soft);">${c.label.split(' ')[0]}</div>`).join('');
-  const heatRows = DEPTS.map((d,i)=>{
+  const heatRows = myDepts.map(i=>{
+    const d = DEPTS[i];
     const rowCells = CLUSTERS.map(c=>{
       const rows = allRows.filter(r=>r.deptIdx===i && r.cluster===c.key);
       if(!rows.length) return `<div class="heat-cell" style="background:#EEECE3;color:#B7B2A0;">—</div>`;
@@ -1246,25 +1323,11 @@ async function viewDirectorDashboard(){
     return `<div class="heat-cell" style="background:transparent;color:var(--ink);text-align:left;font-weight:700;">${d}</div>${rowCells}`;
   }).join('');
 
-  // Top priority table
-  const topPriority = allRows
-    .filter(r => (dashFilterDept==='all'||parseInt(dashFilterDept,10)===r.deptIdx) && (dashFilterCluster==='all'||dashFilterCluster===r.cluster))
-    .sort((a,b)=>b.gap-a.gap)
-    .slice(0,15)
-    .map(r=>`<tr>
-      <td><b>${r.dept}</b></td>
-      <td>${r.name}<div class="small muted">${clusterMeta(r.cluster).label}</div></td>
-      <td style="text-align:center;">${r.required}</td>
-      <td style="text-align:center;">${r.self}</td>
-      <td class="gap-cell ${gapClass(r.gap)}" style="text-align:center;">${r.gap>0?'+'+r.gap:r.gap}</td>
-      <td>${actionForGap(r.gap)}</td>
-    </tr>`).join('') || `<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">No data for this filter yet.</td></tr>`;
-
   // Company-wide view: all 33 competencies, ranked by how many HODs share
-  // the gap — this is what tells you "one workshop covers 7 people" vs
-  // "this is really just a one-person issue".
-  const companyWide = companyWideCompetencyGaps(1);
-  const companyWideRows = companyWide.map((x,idx)=>{
+  // the gap (across visible departments) — "one workshop covers 7 people"
+  // vs "this is really just a one-person issue".
+  const companyWideAll = companyWideCompetencyGaps(1, myDepts);
+  const companyWideRows = companyWideAll.map((x,idx)=>{
     const isTop = idx < 5;
     return `<tr style="${isTop?'background:var(--gold-100);':''}">
       <td>${isTop?'<span class="badge warn">Priority</span> ':''}<b>${x.name}</b><div class="small muted">${x.clusterLabel} · ${x.code}</div></td>
@@ -1274,16 +1337,59 @@ async function viewDirectorDashboard(){
     </tr>`;
   }).join('') || `<tr><td colspan="4" class="muted" style="text-align:center;padding:24px;">No Director ratings yet — rate HODs in Self-Ratings &amp; Gaps to populate this.</td></tr>`;
 
+  // ===== Department deep-dive (shown only when one department is selected) =====
+  let deptDeepDiveHtml = '';
+  if(deptSelected){
+    const di = parseInt(dashFilterDept,10);
+    const dName = DEPTS[di];
+    const deptAllRows = gapRowsForDept(di);
+    const relevant = deptAllRows.filter(r => dashFilterCluster==='all' || r.cluster===dashFilterCluster);
+    const withGap = relevant.filter(r=>r.gap!=null && r.gap>=1).sort((a,b)=>b.gap-a.gap);
+    const onTrack = relevant.filter(r=>r.gap!=null && r.gap<=0).length;
+    const notRated = relevant.filter(r=>r.gap==null).length;
+
+    const byClusterBody = CLUSTERS.map(cl=>{
+      if(dashFilterCluster!=='all' && dashFilterCluster!==cl.key) return '';
+      const clusterRowsForDept = withGap.filter(r=>r.cluster===cl.key);
+      if(!clusterRowsForDept.length) return '';
+      const rowsHtml = clusterRowsForDept.map(r=>`<tr>
+        <td style="width:56px;"><span class="badge neutral">${r.code}</span></td>
+        <td>${r.name}</td>
+        <td style="text-align:center; width:70px;">${r.required}</td>
+        <td style="text-align:center; width:70px;">${r.self!=null?r.self:'<span class="muted">—</span>'}</td>
+        <td class="gap-cell ${gapClass(r.gap)}" style="text-align:center; width:80px;">+${r.gap}</td>
+        <td>${actionForGap(r.gap)}</td>
+      </tr>`).join('');
+      return `<tr><td colspan="6" style="background:${cl.color}; color:#fff; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em;">${cl.label} (${clusterRowsForDept.length})</td></tr>${rowsHtml}`;
+    }).join('');
+
+    deptDeepDiveHtml = `
+    <div class="panel card" style="border-color:var(--gold-500); border-width:1.5px;">
+      <h3>🔍 ${dName} — Full Gap Breakdown</h3>
+      <div class="panel-desc">Every competency with a gap of 1 or more against required standard, grouped by cluster. ${onTrack} on track/exceeding · ${notRated} not yet rated by you.</div>
+      ${withGap.length ? `
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Code</th><th>Competency</th><th>Req.</th><th>Self</th><th>Gap</th><th>Suggested Action</th></tr></thead>
+          <tbody>${byClusterBody}</tbody>
+        </table>
+      </div>
+      <div class="row gap12" style="margin-top:14px;">
+        <button class="btn btn-ghost" onclick="exportDeptDeepDiveExcel(${di})">⬇ Export ${dName}'s gaps (Excel)</button>
+      </div>` : `<div class="empty-state"><div class="big">✅</div>No gaps of 1 or more for ${dName}${dashFilterCluster!=='all'?' in this cluster':''} — every rated competency is on track or exceeding.</div>`}
+    </div>`;
+  }
+
   return `
     <div class="topbar">
       <h2>Analytics Dashboard</h2>
-      <div class="desc">Organisation-wide competency gap analysis, based on your ratings (not self-ratings).</div>
+      <div class="desc">${isFullAdmin() ? 'Organisation-wide' : "Your department(s)'"} competency gap analysis, based on your ratings (not self-ratings).</div>
     </div>
     <div class="toolbar">
       <div><label class="small muted" style="display:block;margin-bottom:4px;">Department</label>
         <select id="dashDeptSelect" onchange="onDashDeptChange(this.value)">
-          <option value="all" ${dashFilterDept==='all'?'selected':''}>All Departments</option>
-          ${DEPTS.map((d,i)=>`<option value="${i}" ${dashFilterDept==String(i)?'selected':''}>${d}</option>`).join('')}
+          <option value="all" ${dashFilterDept==='all'?'selected':''}>All ${isFullAdmin()?'Departments':'My Departments'}</option>
+          ${myDepts.map(i=>`<option value="${i}" ${dashFilterDept==String(i)?'selected':''}>${DEPTS[i]}</option>`).join('')}
         </select>
       </div>
       <div><label class="small muted" style="display:block;margin-bottom:4px;">Cluster</label>
@@ -1294,21 +1400,34 @@ async function viewDirectorDashboard(){
       </div>
       <div style="margin-left:auto; display:flex; gap:10px;">
         <button class="btn btn-ghost" onclick="showView('d-dashboard')">↻ Refresh</button>
-        <button class="btn btn-ghost" onclick="exportGapsCSV()">⬇ Export gap data (CSV)</button>
+        <button class="btn btn-ghost" onclick="exportGapsCSV()">⬇ CSV</button>
+        <button class="btn btn-primary" onclick="exportDashboardExcel()">⬇ Full Report (Excel)</button>
       </div>
     </div>
     <div class="kpi-grid">
       <div class="card kpi"><div class="lbl">Competencies in view</div><div class="val">${kpiTotal}</div></div>
       <div class="card kpi"><div class="lbl">Average Gap</div><div class="val">${kpiAvgGap}</div></div>
       <div class="card kpi"><div class="lbl">Critical (gap ≥2)</div><div class="val">${kpiCritical}</div></div>
-      <div class="card kpi"><div class="lbl">On Track / Exceeding</div><div class="val">${kpiOnTrack}</div></div>
+      <div class="card kpi"><div class="lbl">Readiness</div><div class="val">${readinessPct!=null?readinessPct+'%':'—'}</div><div class="sub">On track or exceeding</div></div>
     </div>
+    ${deptDeepDiveHtml}
     <div class="panel card">
       <h3>Company-Wide Training Needs — All 33 Competencies</h3>
-      <div class="panel-desc">Ranked by how many HODs share the same gap. The gold-highlighted top 5 are where a single workshop helps the most people — the best use of your L&amp;D budget. This list ignores the Department/Cluster filters above (it's always company-wide).</div>
+      <div class="panel-desc">Ranked by how many HODs share the same gap. The gold-highlighted top 5 are where a single workshop helps the most people — the best use of your L&amp;D budget. ${isFullAdmin() ? "This list ignores the Department/Cluster filters above (it's always company-wide)." : "Scoped to your assigned department(s)."}</div>
       <table>
         <thead><tr><th>Competency</th><th># of HODs</th><th>Avg Gap</th><th>Which Departments</th></tr></thead>
         <tbody>${companyWideRows}</tbody>
+      </table>
+      <div class="row gap12" style="margin-top:12px;">
+        <button class="btn btn-ghost" onclick="exportCompanyWideExcel()">⬇ Export this list (Excel)</button>
+      </div>
+    </div>
+    <div class="panel card">
+      <h3>Gap by Competency Cluster</h3>
+      <div class="panel-desc">Which of the 4 clusters — Functional, Leadership, Strategic, Behavioural — needs the most attention overall.</div>
+      <table>
+        <thead><tr><th>Cluster</th><th>Relative Gap</th><th>Avg Gap</th><th>Critical (≥2)</th></tr></thead>
+        <tbody>${clusterRows}</tbody>
       </table>
     </div>
     <div class="panel card">
@@ -1323,22 +1442,94 @@ async function viewDirectorDashboard(){
         ${heatHeader}${heatRows}
       </div>
     </div>
-    <div class="panel card">
-      <h3>Individual Priorities (filtered view)</h3>
-      <div class="panel-desc">Same data as above, but per HOD instance — useful once you've narrowed to one department.</div>
-      <table>
-        <thead><tr><th>Department</th><th>Competency</th><th>Req.</th><th>Self</th><th>Gap</th><th>Suggested Action</th></tr></thead>
-        <tbody>${topPriority}</tbody>
-      </table>
-    </div>
   `;
 }
 function onDashDeptChange(v){ dashFilterDept = v; showView('d-dashboard'); }
 function onDashClusterChange(v){ dashFilterCluster = v; showView('d-dashboard'); }
 
+function exportDeptDeepDiveExcel(deptIdx){
+  const dName = DEPTS[deptIdx];
+  const rows = gapRowsForDept(deptIdx)
+    .filter(r=>r.gap!=null && r.gap>=1)
+    .sort((a,b)=>b.gap-a.gap)
+    .map(r=>[r.code, r.name, r.clusterLabel, r.required, r.self!=null?r.self:'', r.gap, actionForGap(r.gap)]);
+  exportSheetsToExcel(`${dName.replace(/[^a-zA-Z0-9]+/g,'_')}_Gap_Report.xlsx`, [{
+    name: dName.slice(0,31),
+    headers: ['Code','Competency','Cluster','Required','Self','Gap','Suggested Action'],
+    rows
+  }]);
+}
+function exportCompanyWideExcel(){
+  const myDepts = visibleDeptIndices();
+  const data = companyWideCompetencyGaps(1, myDepts);
+  const rows = data.map((x,idx)=>[idx+1, x.code, x.name, x.clusterLabel, x.count, fmt1(x.avgGap), x.depts.join(', ')]);
+  exportSheetsToExcel('Company_Wide_Training_Needs.xlsx', [{
+    name: 'Training Needs',
+    headers: ['Priority Rank','Code','Competency','Cluster','# of HODs','Avg Gap','Departments Affected'],
+    rows
+  }]);
+}
+function exportDashboardExcel(){
+  const myDepts = visibleDeptIndices();
+  const companyWide = companyWideCompetencyGaps(1, myDepts);
+  const cwRows = companyWide.map((x,idx)=>[idx+1, x.code, x.name, x.clusterLabel, x.count, fmt1(x.avgGap), x.depts.join(', ')]);
+
+  let allGapRows = [];
+  myDepts.forEach(i=>{
+    const d = DEPTS[i];
+    if(SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status !== 'not_started'){
+      gapRowsForDept(i).forEach(r=>{
+        if(r.gap!=null) allGapRows.push([d, r.clusterLabel, r.code, r.name, r.required, r.self!=null?r.self:'', r.gap, actionForGap(r.gap)]);
+      });
+    }
+  });
+  allGapRows.sort((a,b)=>b[6]-a[6]);
+
+  const deptSummaryRows = myDepts.map(i=>{
+    const d = DEPTS[i];
+    const rows = gapRowsForDept(i).filter(r=>r.gap!=null);
+    const avgG = rows.length? avg(rows.map(r=>r.gap)) : null;
+    const critical = rows.filter(r=>r.gap>=2).length;
+    const onTrack = rows.filter(r=>r.gap<=0).length;
+    return [d, rows.length, avgG!=null?fmt1(avgG):'', critical, onTrack];
+  });
+
+  exportSheetsToExcel('Mangalam_Competency_Dashboard_Report.xlsx', [
+    {name:'Department Summary', headers:['Department','Competencies Rated','Avg Gap','Critical (≥2)','On Track/Exceeding'], rows: deptSummaryRows},
+    {name:'Company-Wide Training Needs', headers:['Priority Rank','Code','Competency','Cluster','# of HODs','Avg Gap','Departments Affected'], rows: cwRows},
+    {name:'All Gaps (Detail)', headers:['Department','Cluster','Code','Competency','Required','Self','Gap','Suggested Action'], rows: allGapRows},
+  ]);
+}
+
+/* Generic Excel export: sheets = [{name, headers:[...], rows:[[...],[...]]}] */
+function exportSheetsToExcel(filename, sheets){
+  try{
+    const wb = XLSX.utils.book_new();
+    sheets.forEach(s=>{
+      const aoa = [s.headers, ...s.rows];
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      const colCount = s.headers.length;
+      ws['!cols'] = Array.from({length: colCount}, (_, i) => {
+        const maxLen = Math.max(
+          String(s.headers[i]||'').length,
+          ...s.rows.map(r => String(r[i]==null?'':r[i]).length)
+        );
+        return {wch: Math.min(50, Math.max(10, maxLen + 2))};
+      });
+      XLSX.utils.book_append_sheet(wb, ws, s.name.slice(0,31));
+    });
+    XLSX.writeFile(wb, filename);
+    return true;
+  }catch(e){
+    console.error('Excel export failed', e);
+    alert('Excel export failed — your browser may be blocking the download. Try again, or use the CSV export instead.');
+    return false;
+  }
+}
 function exportGapsCSV(){
   let rows = [['Department','Cluster','Code','Competency','Required','Self','Gap','Suggested Action']];
-  DEPTS.forEach((d,i)=>{
+  visibleDeptIndices().forEach(i=>{
+    const d = DEPTS[i];
     if(SELFRATE_CACHE[i] && SELFRATE_CACHE[i].status !== 'not_started'){
       gapRowsForDept(i).forEach(r=>{
         if(r.gap!=null){
@@ -1374,11 +1565,12 @@ async function viewDirectorCalendar(){
   await refreshAllDirectorData();
   if(TRAINING_PLANS_CACHE === null){ TRAINING_PLANS_CACHE = await loadTrainingPlans(); }
   const forwardQuarters = getForwardQuarters();
+  const myDepts = visibleDeptIndices();
 
   // Live company-wide gaps (any count, so we can still show a plan that
   // has since dropped below threshold rather than losing the Director's
   // budget/trainer entries).
-  const liveAll = companyWideCompetencyGaps(1);
+  const liveAll = companyWideCompetencyGaps(1, myDepts);
   const liveByCode = {}; liveAll.forEach(x => liveByCode[x.code] = x);
   const liveCompanyWide = liveAll.filter(x => x.count >= COMPANY_WIDE_THRESHOLD);
   const defaultQuarters = assignDefaultQuarters(liveCompanyWide, forwardQuarters);
@@ -1434,7 +1626,8 @@ async function viewDirectorCalendar(){
   // Individual coaching — everyone else (gaps shared by <3 HODs), read-only reference
   const companyWideCodes = new Set(liveCompanyWide.map(x=>x.code));
   let individualRows = [];
-  DEPTS.forEach((d,i)=>{
+  myDepts.forEach(i=>{
+    const d = DEPTS[i];
     gapRowsForDept(i).forEach(r=>{
       if(r.gap != null && r.gap > 0 && !companyWideCodes.has(r.code)){
         individualRows.push(Object.assign({dept:d}, r));
@@ -1540,11 +1733,18 @@ async function viewDirectorAccess(){
   const adminRows = STRUCT.admins.map(a=>{
     const linkedDept = a.deptSlug ? DEPTS[findDeptIndexBySlug(a.deptSlug)] : '<span class="muted">— Admin only —</span>';
     const deptOptions = `<option value="">— Admin only —</option>` + STRUCT.departments.map(d=>`<option value="${d.slug}" ${a.deptSlug===d.slug?'selected':''}>${d.name}</option>`).join('');
+    const scope = a.scopeDepts || [];
+    const scopeOptions = STRUCT.departments.map(d=>`<option value="${d.slug}" ${scope.includes(d.slug)?'selected':''}>${d.name}</option>`).join('');
+    const scopeLabel = scope.length ? scope.map(s=>{const idx=findDeptIndexBySlug(s); return idx!=null?DEPTS[idx]:s;}).join(', ') : 'Full Access (all departments)';
     return `<tr>
       <td><b>${a.name}</b></td>
       <td><code>${a.passcode}</code></td>
       <td>
-        <select onchange="setAdminDept('${a.id}', this.value)" style="min-width:200px;">${deptOptions}</select>
+        <select onchange="setAdminDept('${a.id}', this.value)" style="min-width:180px;">${deptOptions}</select>
+      </td>
+      <td>
+        <select multiple size="3" onchange="setAdminScope('${a.id}', this)" style="min-width:190px;">${scopeOptions}</select>
+        <div class="small muted" style="margin-top:4px;">${scope.length?scopeLabel:'<b style="color:var(--good);">Full Access</b>'}</div>
       </td>
       <td style="display:flex; gap:6px; flex-wrap:wrap;">
         <button class="btn btn-ghost" onclick="resetAdminPass('${a.id}')">Reset passcode</button>
@@ -1566,9 +1766,9 @@ async function viewDirectorAccess(){
     </div>
     <div class="panel card">
       <h3>Director / Admin Users</h3>
-      <div class="panel-desc">Everyone listed here has full access: Set Standards, all Self-Ratings &amp; Gaps, Analytics, Training Calendar, Manage Access, and Manage Structure.</div>
+      <div class="panel-desc">By default everyone here has full access to everything. Optionally link an admin to one department so their login also doubles as that department's HOD self-assessment — and/or set a <b>Department Scope</b> to restrict them to only Set Standards, Self-Ratings &amp; Gaps, and the Dashboard for specific department(s), hiding Manage Structure, Manage Access, and Backup &amp; Restore. Ctrl/Cmd-click to select multiple, or select none for Full Access.</div>
       <table>
-        <thead><tr><th>Name</th><th>Password</th><th>Linked Department (optional — adds HOD self-assessment)</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Name</th><th>Password</th><th>Linked Department (adds HOD self-assessment)</th><th>Department Scope (restricts admin access)</th><th>Actions</th></tr></thead>
         <tbody>${adminRows}</tbody>
       </table>
       <div class="row gap12" style="margin-top:16px; flex-wrap:wrap;">
@@ -1612,7 +1812,7 @@ async function addAdmin(){
   while(existingIds.includes(id)){ id = base + '-' + n; n++; }
   const firstName = name.split(/\s+/)[0];
   const passcode = firstName + '@' + Math.floor(100 + Math.random()*900);
-  STRUCT.admins.push({id, name, passcode, deptSlug:null});
+  STRUCT.admins.push({id, name, passcode, deptSlug:null, scopeDepts:null});
   await saveAdmins();
   accessMsg = {text:`Added "${name}" with full admin access. Default password: ${passcode} — share this with them directly.`, ok:true};
   showView('d-access');
@@ -1644,6 +1844,29 @@ async function setAdminDept(id, deptSlug){
       await loadStandardsFor(CURRENT.deptIndex);
       await loadSelfRateFor(CURRENT.deptIndex);
     }
+  }
+  showView('d-access');
+}
+async function setAdminScope(id, selectEl){
+  const admin = STRUCT.admins.find(a=>a.id===id);
+  if(!admin) return;
+  const selected = Array.from(selectEl.selectedOptions).map(o=>o.value).filter(Boolean);
+  admin.scopeDepts = selected.length ? selected : null;
+  await saveAdmins();
+  const label = selected.length
+    ? selected.map(s=>{const idx=findDeptIndexBySlug(s); return idx!=null?DEPTS[idx]:s;}).join(', ')
+    : 'Full Access (all departments)';
+  accessMsg = {text: `${admin.name}'s scope is now: ${label}.`, ok:true};
+  // if the admin being edited is the currently logged-in user, refresh their live session immediately
+  if(CURRENT && CURRENT.role === 'director' && CURRENT.adminId === id){
+    CURRENT.scopeDepts = admin.scopeDepts;
+    document.querySelectorAll('.full-admin-only').forEach(el=>{
+      el.classList.toggle('hidden', !isFullAdmin());
+    });
+    const myDepts = visibleDeptIndices();
+    dirStandardsDept = myDepts[0] != null ? myDepts[0] : 0;
+    dirRatingsDept = myDepts[0] != null ? myDepts[0] : 0;
+    dashFilterDept = 'all'; calFilterDept = 'all';
   }
   showView('d-access');
 }
