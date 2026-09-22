@@ -575,6 +575,24 @@ async function initStructure(){
     }
     await kset('structure_departments', depts);
   }
+  // One-time migration: rename "Director" login to "HR View", give Ram Phuge
+  // scoped access to Legal & Liaisoning, Business Development & Land
+  // Acquisition, and Accounts & Finance, and give Subhash Sakore scoped
+  // access to every other department. Guarded by a marker key so it only
+  // ever runs once, and won't clobber any manual re-scoping done later.
+  const scopeMigrationDone = await kget('migration_scope_ram_subhash_v1');
+  if(!scopeMigrationDone){
+    const hrAdmin = admins.find(a=>a.id==='director');
+    if(hrAdmin && hrAdmin.name === 'Director'){ hrAdmin.name = 'HR View'; }
+    const allSlugs = depts.map(d=>d.slug);
+    const ramSlugs = ['legal-liaisoning','business-development-land-acquisition','accounts-finance'].filter(s=>allSlugs.includes(s));
+    const ramAdmin = admins.find(a=>a.id==='ram-phuge');
+    if(ramAdmin) ramAdmin.scopeDepts = ramSlugs;
+    const ssAdmin = admins.find(a=>a.id==='subhash-sakore');
+    if(ssAdmin) ssAdmin.scopeDepts = allSlugs.filter(s=>!ramSlugs.includes(s));
+    await kset('structure_admins', admins);
+    await kset('migration_scope_ram_subhash_v1', true);
+  }
   let trainers = await kget('structure_trainers');
   if(!trainers){ trainers = []; await kset('structure_trainers', trainers); }
   STRUCT.departments = depts;
@@ -663,7 +681,7 @@ function setLoginRole(role){
   document.getElementById('login-error').textContent = '';
   const hint = document.getElementById('loginHint');
   if(role==='director'){
-    hint.innerHTML = 'First time here? Pick your name, then use the default password shown to you in <b>Manage Access</b> (e.g. Director@123). Change it anytime after signing in.';
+    hint.innerHTML = 'First time here? Pick your name, then use the default password shown to you in <b>Manage Access</b>. Change it anytime after signing in.';
   } else {
     hint.innerHTML = 'First time here? Default passcode is your department code + <b>@123</b> (e.g. Accounts &amp; Finance → <b>ACF@123</b>). Ask your Director/Admin if it has been changed.';
   }
