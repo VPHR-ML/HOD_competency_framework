@@ -332,7 +332,8 @@
       <div class="navitem" data-view="d-dashboard" onclick="showView('d-dashboard')">Analytics Dashboard</div>
       <div class="navitem" data-view="d-calendar" onclick="showView('d-calendar')">Training Calendar</div>
       <div class="navitem full-admin-only" data-view="d-access" onclick="showView('d-access')">Manage Access</div>
-      <div class="navitem full-admin-only" data-view="d-structure" onclick="structDeptMsg={text:'',ok:true}; structCompMsg={text:'',ok:true}; showView('d-structure')">Manage Structure</div>
+      <div class="navitem full-admin-only" data-view="d-structure" onclick="structDeptMsg={text:'',ok:true}; showView('d-structure')">Manage Departments</div>
+      <div class="navitem" data-view="d-competencies" onclick="structCompMsg={text:'',ok:true}; showView('d-competencies')">Manage Competencies</div>
       <div class="navitem" data-view="d-trainers" onclick="trainerMsg={text:'',ok:true}; showView('d-trainers')">Trainer Directory</div>
       <div class="navitem full-admin-only" data-view="d-backup" onclick="backupMsg={text:'',ok:true}; showView('d-backup')">Backup &amp; Restore</div>
       <div class="navitem" data-view="guide" onclick="showView('guide')">Process Guide</div>
@@ -575,6 +576,22 @@ async function initStructure(){
     }
     await kset('structure_departments', depts);
   }
+  // One-time migration: further split "Legal & Liaisoning" into two
+  // separate departments — "Legal" keeps any existing data; "Liaisoning"
+  // starts blank.
+  const legalIdx = depts.findIndex(d => d.slug === 'legal-liaisoning');
+  if(legalIdx >= 0){
+    const oldDept = depts[legalIdx];
+    const legalDept = {slug:'legal', name:'Legal', shortCode:'LGL'};
+    const liaisonDept = {slug:'liaisoning', name:'Liaisoning', shortCode:'LSN'};
+    depts.splice(legalIdx, 1, legalDept, liaisonDept);
+    const keysToCopy2 = ['standards_', 'selfrate_', 'assessor_', 'std_comment_', 'review_comment_', 'auth_dept_pass_'];
+    for(const prefix of keysToCopy2){
+      const val = await kget(prefix + oldDept.slug);
+      if(val != null) await kset(prefix + legalDept.slug, val);
+    }
+    await kset('structure_departments', depts);
+  }
   // One-time migration: rename "Director" login to "HR View", give Ram Phuge
   // scoped access to Legal & Liaisoning, Business Development & Land
   // Acquisition, and Accounts & Finance, and give Subhash Sakore scoped
@@ -592,6 +609,21 @@ async function initStructure(){
     if(ssAdmin) ssAdmin.scopeDepts = allSlugs.filter(s=>!ramSlugs.includes(s));
     await kset('structure_admins', admins);
     await kset('migration_scope_ram_subhash_v1', true);
+  }
+  // v2: corrects the above now that Legal & Liaisoning is two departments —
+  // Ram should have Legal, Liaisoning, Business Development & Land
+  // Acquisition, and Accounts & Finance (4 total); Subhash gets everything
+  // else. Guarded by its own marker so it only runs once too.
+  const scopeMigrationV2Done = await kget('migration_scope_ram_subhash_v2');
+  if(!scopeMigrationV2Done){
+    const allSlugs = depts.map(d=>d.slug);
+    const ramSlugs = ['legal','liaisoning','business-development-land-acquisition','accounts-finance'].filter(s=>allSlugs.includes(s));
+    const ramAdmin = admins.find(a=>a.id==='ram-phuge');
+    if(ramAdmin) ramAdmin.scopeDepts = ramSlugs;
+    const ssAdmin = admins.find(a=>a.id==='subhash-sakore');
+    if(ssAdmin) ssAdmin.scopeDepts = allSlugs.filter(s=>!ramSlugs.includes(s));
+    await kset('structure_admins', admins);
+    await kset('migration_scope_ram_subhash_v2', true);
   }
   let trainers = await kget('structure_trainers');
   if(!trainers){ trainers = []; await kset('structure_trainers', trainers); }
@@ -611,7 +643,9 @@ async function saveStructure(){
   STANDARDS_CACHE = {};
   SELFRATE_CACHE = {};
   ASSESSOR_CACHE = {};
-  dirStandardsDept = 0; dirRatingsDept = 0;
+  const myDepts = visibleDeptIndices();
+  dirStandardsDept = myDepts[0] != null ? myDepts[0] : 0;
+  dirRatingsDept = myDepts[0] != null ? myDepts[0] : 0;
   dashFilterDept = 'all'; calFilterDept = 'all';
 }
 async function saveAdmins(){
@@ -883,7 +917,8 @@ async function renderView(viewId){
     case 'd-dashboard': return await viewDirectorDashboard();
     case 'd-calendar': return await viewDirectorCalendar();
     case 'd-access': return await viewDirectorAccess();
-    case 'd-structure': return viewDirectorStructure();
+    case 'd-structure': return viewManageDepartments();
+    case 'd-competencies': return viewManageCompetencies();
     case 'd-trainers': return viewTrainerDirectory();
     case 'd-backup': return await viewDirectorBackup();
     case 'h-rate': return await viewHodRate();
@@ -1915,7 +1950,7 @@ let structClusterTab = 'functional';
 let structDeptMsg = {text:'', ok:true};
 let structCompMsg = {text:'', ok:true};
 
-function viewDirectorStructure(){
+function viewManageDepartments(){
   const deptRows = STRUCT.departments.map((d,i)=>`<tr>
     <td><b>${d.name}</b><div class="small muted">slug: ${d.slug}</div></td>
     <td><code>${d.shortCode}</code></td>
@@ -1925,26 +1960,11 @@ function viewDirectorStructure(){
     </td>
   </tr>`).join('');
 
-  const comps = compsByCluster(structClusterTab);
-  const meta = clusterMeta(structClusterTab);
-  const compRows = comps.map(c=>`<tr>
-    <td style="width:56px;"><span class="badge neutral">${c.code}</span></td>
-    <td>
-      <b>${c.name}</b>
-      <div class="small muted" style="margin-top:3px; max-width:520px;">${c.definition||''}</div>
-    </td>
-    <td style="display:flex; gap:6px;">
-      <button class="btn btn-ghost" onclick="openEditCompetency('${c.code}')">Edit</button>
-      <button class="btn btn-danger-ghost" onclick="promptDeleteCompetency('${c.code}')">Delete</button>
-    </td>
-  </tr>`).join('');
-
   return `
     <div class="topbar">
-      <h2>Manage Structure</h2>
-      <div class="desc">Add, rename, or remove departments and competencies. Changes apply immediately across Set Standards, Self-Ratings, Dashboard and Calendar — new items start with neutral defaults you can adjust in <b>Set Standards</b>.</div>
+      <h2>Manage Departments</h2>
+      <div class="desc">Add, rename, or remove departments (HOD roles). Changes apply immediately across Set Standards, Self-Ratings, Dashboard and Calendar. This section is only available to HR View (full access) — Director/Admin logins scoped to specific departments cannot change the department list.</div>
     </div>
-
     <div class="panel card">
       <h3>Departments / HOD Roles</h3>
       <div class="panel-desc">${STRUCT.departments.length} department(s). Deleting a department permanently removes its standards, self-ratings and login passcode.</div>
@@ -1958,10 +1978,33 @@ function viewDirectorStructure(){
       </div>
       <div id="deptMsg" class="small" style="color:${structDeptMsg.ok?'var(--good)':'var(--danger)'}; min-height:18px; margin-top:6px;">${structDeptMsg.text}</div>
     </div>
+  `;
+}
 
+function viewManageCompetencies(){
+  const comps = compsByCluster(structClusterTab);
+  const meta = clusterMeta(structClusterTab);
+  const canDelete = isFullAdmin();
+  const compRows = comps.map(c=>`<tr>
+    <td style="width:56px;"><span class="badge neutral">${c.code}</span></td>
+    <td>
+      <b>${c.name}</b>
+      <div class="small muted" style="margin-top:3px; max-width:520px;">${c.definition||''}</div>
+    </td>
+    <td style="display:flex; gap:6px;">
+      <button class="btn btn-ghost" onclick="openEditCompetency('${c.code}')">Edit</button>
+      ${canDelete ? `<button class="btn btn-danger-ghost" onclick="promptDeleteCompetency('${c.code}')">Delete</button>` : ''}
+    </td>
+  </tr>`).join('');
+
+  return `
+    <div class="topbar">
+      <h2>Manage Competencies</h2>
+      <div class="desc">Add or rename competencies and edit their definitions / "what good looks like" text. Changes apply immediately across every department's Set Standards and Self-Ratings screens — this is shared across the whole company.${!canDelete?' Deleting a competency is restricted to HR View, to prevent accidental data loss across every department.':''}</div>
+    </div>
     <div class="panel card">
       <h3>Competencies</h3>
-      <div class="panel-desc">${COMP.length} competenc${COMP.length===1?'y':'ies'} across 4 clusters. Deleting a competency permanently removes it from every department's standards and self-ratings.</div>
+      <div class="panel-desc">${COMP.length} competenc${COMP.length===1?'y':'ies'} across 4 clusters.</div>
       ${tabsHtml(CLUSTERS, structClusterTab, 'onStructClusterChange')}
       <table>
         <thead><tr><th>Code</th><th>Competency</th><th>Actions</th></tr></thead>
@@ -1984,7 +2027,7 @@ function viewDirectorStructure(){
     </div>
   `;
 }
-function onStructClusterChange(k){ structClusterTab = k; showView('d-structure'); }
+function onStructClusterChange(k){ structClusterTab = k; showView('d-competencies'); }
 
 async function addDepartment(){
   const nameInput = document.getElementById('newDeptName');
@@ -2025,7 +2068,7 @@ async function addCompetency(){
   const name = document.getElementById('newCompName').value.trim();
   const def = document.getElementById('newCompDef').value.trim();
   const ind = document.getElementById('newCompInd').value.trim();
-  if(!name){ structCompMsg = {text:'Enter a competency name.', ok:false}; showView('d-structure'); return; }
+  if(!name){ structCompMsg = {text:'Enter a competency name.', ok:false}; showView('d-competencies'); return; }
   const code = nextCompetencyCode(structClusterTab);
   const meta = clusterMeta(structClusterTab);
   STRUCT.competencies.push({
@@ -2034,7 +2077,7 @@ async function addCompetency(){
   });
   await saveStructure();
   structCompMsg = {text:`Added "${name}" (${code}) to ${meta.label}. Default required standard is 3 for all departments until you adjust it in Set Standards.`, ok:true};
-  showView('d-structure');
+  showView('d-competencies');
 }
 function openEditCompetency(code){
   const c = STRUCT.competencies.find(x=>x.code===code);
@@ -2048,16 +2091,20 @@ function openEditCompetency(code){
   c.name = newName.trim() || c.name;
   c.definition = newDef.trim();
   c.indicators = newInd.trim();
-  saveStructure().then(()=>showView('d-structure'));
+  saveStructure().then(()=>showView('d-competencies'));
 }
 async function promptDeleteCompetency(code){
+  if(!isFullAdmin()){
+    alert('Deleting a competency is restricted to HR View (full access), to prevent accidental data loss across every department.');
+    return;
+  }
   const c = STRUCT.competencies.find(x=>x.code===code);
   if(!c) return;
   const ok = confirm(`Delete "${c.name}" (${code})? This removes it from every department's standards and self-ratings. This cannot be undone.`);
   if(!ok) return;
   STRUCT.competencies = STRUCT.competencies.filter(x=>x.code!==code);
   await saveStructure();
-  showView('d-structure');
+  showView('d-competencies');
 }
 
 /* ===================== DIRECTOR: TRAINER DIRECTORY ===================== */
